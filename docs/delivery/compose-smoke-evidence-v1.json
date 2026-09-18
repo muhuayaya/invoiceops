@@ -3,15 +3,15 @@
   "executed_at": "2026-09-16",
   "environment": {
     "host": "Docker VM",
-    "vm_ip": "192.168.88.100",
-    "project_directory": "/home/itheima/invoiceops",
+    "vm_ip": "VM_IP",
+    "project_directory": "/home/VM_USER/invoiceops",
     "docker_server": "29.3.0",
     "docker_compose": "v5.1.0",
     "env": {
       "DATABASE_URL": "postgresql+psycopg://invoiceops:invoiceops@db:5432/invoiceops",
       "REDIS_URL": "redis://redis:6379/0",
-      "VITE_API_BASE_URL": "http://192.168.88.100:8000",
-      "INVOICEOPS_CORS_ORIGINS": "http://192.168.88.100:3000"
+      "VITE_API_BASE_URL": "http://VM_IP:8000",
+      "INVOICEOPS_CORS_ORIGINS": "http://VM_IP:3000"
     }
   },
   "command": "docker compose up --build -d",

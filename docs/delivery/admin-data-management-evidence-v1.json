@@ -3,8 +3,8 @@
   "executed_at": "2026-09-16",
   "environment": {
     "host": "Docker VM",
-    "vm_ip": "192.168.88.100",
-    "project_directory": "/home/itheima/invoiceops",
+    "vm_ip": "VM_IP",
+    "project_directory": "/home/VM_USER/invoiceops",
     "backend": "PostgreSQL",
     "queue": "Redis"
   },

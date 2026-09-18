@@ -2,8 +2,8 @@
   "evidence_version": "remote-verification-v2",
   "executed_at": "2026-09-17",
   "environment": {
-    "vm_ip": "192.168.88.100",
-    "project_directory": "/home/itheima/invoiceops",
+    "vm_ip": "VM_IP",
+    "project_directory": "/home/VM_USER/invoiceops",
     "compose_backend": "PostgreSQL",
     "compose_queue": "Redis"
   },
@@ -17,7 +17,7 @@
     "api_readyz": 200,
     "web": 200,
     "cors_preflight": 200,
-    "cors_allow_origin": "http://192.168.88.100:3000"
+    "cors_allow_origin": "http://VM_IP:3000"
   },
   "runtime_contract": {
     "web_bundle": "/assets/index-Bh_q5yAC.js",

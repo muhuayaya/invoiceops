@@ -17,15 +17,15 @@ API 位于 `http://localhost:8000`，工作台位于 `http://localhost:3000`。�
 
 推荐在 Docker 虚拟机内运行完整 Compose，让 PostgreSQL、Redis、API、worker 和 Web 使用 Compose 服务名互联，并在 API/worker 启动前通过 `migrate` 服务执行 Alembic 迁移；不要让容器跨网络依赖 Windows 上的 phpstudy Redis。虚拟机需要 Docker Engine、Compose v2，并能访问项目目录；若从 Windows 触发验收，需要提供虚拟机 IP 和 SSH 连接方式，同时放通 3000/8000 端口。
 
-例如本次 VM `192.168.88.100` 的部署步骤如下（命令在 VM 项目目录执行）：
+例如本次 VM `VM_IP` 的部署步骤如下（命令在 VM 项目目录执行）：
 
 ```bash
 cp .env.example .env
-sed -i 's#^VITE_API_BASE_URL=.*#VITE_API_BASE_URL=http://192.168.88.100:8000#' .env
-sed -i 's#^INVOICEOPS_CORS_ORIGINS=.*#INVOICEOPS_CORS_ORIGINS=http://192.168.88.100:3000#' .env
+sed -i 's#^VITE_API_BASE_URL=.*#VITE_API_BASE_URL=http://VM_IP:8000#' .env
+sed -i 's#^INVOICEOPS_CORS_ORIGINS=.*#INVOICEOPS_CORS_ORIGINS=http://VM_IP:3000#' .env
 docker compose up --build -d
-curl --fail http://192.168.88.100:8000/healthz
-curl --fail http://192.168.88.100:3000/
+curl --fail http://VM_IP:8000/healthz
+curl --fail http://VM_IP:3000/
 ```
 
 phpstudy_pro 的 Redis 只适合宿主机上的 live worker 验证：启动 `redis-server.exe` 后确认 `127.0.0.1:6379` 可连，再设置 `REDIS_URL=redis://127.0.0.1:6379/0`。该方式仍需要独立 PostgreSQL；MySQL 不能替代项目所需的 PostgreSQL。不要把 Redis 绑定到公网地址或在未配置认证时暴露到外网。
@@ -37,7 +37,7 @@ Web 镜像在构建时将 `VITE_API_BASE_URL` 默认编译为 `http://localhost:
 
 ## 跨机器访问
 
-当前 VM 使用 VMware NAT，`192.168.88.100` 适用于宿主机或已接入 VMnet8 的机器。另一台物理机若不在该虚拟网络中，不能直接路由到这个地址。可将 VM 网卡改为 Bridged，使用 VM 获得的局域网 IP；或在 VMnet8 NAT 中仅转发 TCP `3000` 和 `8000` 到 `192.168.88.100`，然后使用宿主机局域网 IP 访问。不要暴露 PostgreSQL `5432`、Redis `6379` 或 MLflow 端口。
+当前 VM 使用 VMware NAT，`VM_IP` 适用于宿主机或已接入 VMnet8 的机器。另一台物理机若不在该虚拟网络中，不能直接路由到这个地址。可将 VM 网卡改为 Bridged，使用 VM 获得的局域网 IP；或在 VMnet8 NAT 中仅转发 TCP `3000` 和 `8000` 到 `VM_IP`，然后使用宿主机局域网 IP 访问。不要暴露 PostgreSQL `5432`、Redis `6379` 或 MLflow 端口。
 
 如果通过新地址（例如 `http://192.168.34.175:3000`）访问，先在 `.env` 中同步设置：
 
