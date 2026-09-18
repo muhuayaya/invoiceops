@@ -146,9 +146,9 @@ def test_real_worker_restart_recovers_without_duplicate_records(tmp_path: Path) 
             time.sleep(0.5)
         recovered = PersistentBatchStore(batch_path).get(job.batch_id)
         assert recovered is not None
-        assert recovered.status == BatchStatus.COMPLETED
-        assert recovered.success_rows == len(rows)
-        assert recovered.failed_rows == 0
+        assert recovered.status == BatchStatus.COMPLETED, recovered.row_errors
+        assert recovered.success_rows == len(rows), recovered.row_errors
+        assert recovered.failed_rows == 0, recovered.row_errors
     finally:
         _stop_worker(second_worker, second_log)
 
