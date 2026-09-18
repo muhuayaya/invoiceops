@@ -27,7 +27,7 @@ export const mockClassification: ClassificationResponse = {
     { label_code: "PAYMENT_STATUS", score: 0.88 },
   ],
   route: { primary: "FINANCE_TAX", collaborators: ["SUPPLIER_HELPDESK"], version: "routes-v1" },
-  model_version: "invoiceops-xlmr-demo",
+  model_version: "keyword-baseline-0.1",
   threshold_version: "thresholds-v1",
   taxonomy_version: "invoiceops-v1",
   inference_ms: 42,
