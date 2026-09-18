@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-invoiceops}
       POSTGRES_USER: ${POSTGRES_USER:-invoiceops}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-invoiceops}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-postgres-only-change-me}
     volumes: ["postgres-data:/var/lib/postgresql/data"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-invoiceops} -d $${POSTGRES_DB:-invoiceops}"]

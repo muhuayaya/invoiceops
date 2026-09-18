@@ -7,7 +7,7 @@
 - 复核与审计查询受 JWT 角色矩阵保护；保留清理会追加审计证明事件。
 - Compose 中 API/worker 通过 `DATABASE_URL` 共享 PostgreSQL 业务仓储；本地 SQLite 仓储仅作为无数据库 URL 的可测试 fallback。
 - 幂等键冲突返回 409，避免重试重复创建业务记录。
-- `.env.example` 只含本地占位秘密，真实秘密必须由部署环境注入。
+- `.env.example` 只含明确的本地开发占位值，真实秘密必须由部署环境注入。
 
 ## 上线前必须补齐
 

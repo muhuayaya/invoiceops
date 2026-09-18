@@ -10,4 +10,4 @@
 
 ## 3. 虚拟机部署验证
 
-- [x] 3.1 将变更同步到 `192.168.88.100:/home/itheima/invoiceops` 并重建 API/worker；确认 Compose 服务健康且批次完成后各读模块无需重启即可展示数据
+- [x] 3.1 将变更同步到 `VM_IP:/home/VM_USER/invoiceops` 并重建 API/worker；确认 Compose 服务健康且批次完成后各读模块无需重启即可展示数据

@@ -52,7 +52,7 @@ curl.exe --fail http://localhost:8000/readyz
 curl.exe --fail http://localhost:3000/
 ~~~
 
-默认演示账号为 admin/admin、reviewer/reviewer、observer/observer，只适合本地 PoC 演示。
+默认演示账号为 admin/admin、reviewer/reviewer、observer/observer，仅在 development/test 环境启用，不能用于生产。
 
 完整命令、虚拟机部署、数据卷和故障排查见[本机 Docker 部署指南](docs/deployment-local-docker.md)和[项目使用手册](docs/使用手册-v1.md)。
 

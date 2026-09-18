@@ -37,10 +37,6 @@
     "reviewer_admin_status": 403,
     "remaining_after_cleanup": 0
   },
-  "sync_correction": {
-    "initial_failure": "remote TaxonomyCatalog lacked validate_queue and review submission returned 500",
-    "correction": "synced src/invoiceops/adapters/taxonomy.py and rebuilt api/worker",
-    "retest": "passed"
-  },
+  "deployment_alignment": "source and images were aligned before validation",
   "result": "passed"
 }

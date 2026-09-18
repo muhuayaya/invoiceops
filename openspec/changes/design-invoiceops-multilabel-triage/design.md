@@ -4,7 +4,7 @@
 
 约束已经确定：3 人协作、交付时间紧但具体周期未知；输入为中文、英文或中英混合文本；同一工单允许多个标签；数据采用公开资料和企业场景模拟数据；外部云端 LLM 只作为低置信度辅助；成果必须可本地运行并展示企业级边界，而不是声称已在真实企业生产验证。
 
-参考项目 `D:\HWClass\NLP_Project\05_代码\TMFCode` 已具备随机森林、FastText、BERT、LLM、量化/蒸馏、Flask API 与 Streamlit 原型。新项目借鉴其“多模型对照、训练—预测—服务—界面”链路，但不复用参考项目的 Flask 服务层，后端 API 统一采用 FastAPI，并修正硬编码、重复模块、评估单一、缺少数据/模型版本、无鉴权审计和不可部署等生产缺口。
+参考项目 `reference project prototype` 已具备随机森林、FastText、BERT、LLM、量化/蒸馏、Flask API 与 Streamlit 原型。新项目借鉴其“多模型对照、训练—预测—服务—界面”链路，但不复用参考项目的 Flask 服务层，后端 API 统一采用 FastAPI，并修正硬编码、重复模块、评估单一、缺少数据/模型版本、无鉴权审计和不可部署等生产缺口。
 
 行业依据：Oracle 的发票校验覆盖税额、订购/收货/开票数量或金额差异、汇率及异常挂起，[Oracle 文档](https://docs.oracle.com/en/cloud/saas/financials/25d/fappp/how-invoices-are-validated.html)可支撑首版标签语义；企业路由拆为“分类”和“分派”两个阶段，[Microsoft Unified Routing](https://learn.microsoft.com/en-us/dynamics365/customer-service/administer/overview-unified-routing)可支撑分类结果与队列规则解耦。公开资料只能证明问题真实存在，不能替代目标企业的历史基线。
 
@@ -67,7 +67,7 @@ API、领域规则和持久化先部署为同一后端应用，批量分类和�
 ### 2. 单仓库、契约优先的目录结构
 
 ```text
-D:\NLP_Enterprise_Level_Project\
+D:\path\to\invoiceops\
 ├─ apps/
 │  ├─ api/                    # FastAPI 启动、路由、依赖注入
 │  ├─ worker/                 # 批量分类、LLM辅助、导出任务

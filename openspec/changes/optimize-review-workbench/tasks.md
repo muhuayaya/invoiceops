@@ -10,4 +10,4 @@
 
 ## 3. Deployment verification
 
-- [x] 3.1 Rebuild the VM Compose API, Worker, and Web services and verify health endpoints plus the reviewer-to-admin status flow against `192.168.88.100`
+- [x] 3.1 Rebuild the VM Compose API, Worker, and Web services and verify health endpoints plus the reviewer-to-admin status flow against `VM_IP`

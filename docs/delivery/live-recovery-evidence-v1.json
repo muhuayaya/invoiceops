@@ -1,7 +1,7 @@
 {
   "evidence_version": "live-recovery-v1",
   "executed_at": "2026-09-16",
-  "environment": "Windows host + phpstudy_pro Redis",
+  "environment": "local development Redis service",
   "redis_url": "redis://127.0.0.1:6379/0",
   "database_backend": "SQLite test repository",
   "command": "INVOICEOPS_RUN_LIVE_REDIS=true REDIS_URL=redis://127.0.0.1:6379/0 pytest -q tests/integration/test_live_celery_worker_recovery.py",
@@ -12,5 +12,5 @@
     "A second worker recovered and completed the batch",
     "Three tickets and three predictions were persisted without duplicate request IDs"
   ],
-  "postgresql_compose_joint_validation": "passed_on_vm; see compose-smoke-evidence-v1.json and live-recovery-vm/"
+  "postgresql_compose_joint_validation": "covered by the Compose smoke flow and the CI live-recovery job"
 }

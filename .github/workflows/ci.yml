@@ -25,7 +25,7 @@ jobs:
         env:
           POSTGRES_DB: invoiceops
           POSTGRES_USER: invoiceops
-          POSTGRES_PASSWORD: invoiceops
+          POSTGRES_PASSWORD: local-postgres-only-change-me
         ports:
           - 5432:5432
         options: >-
@@ -53,7 +53,7 @@ jobs:
         run: pytest -q
       - name: Live Redis/Celery/PostgreSQL recovery
         env:
-          DATABASE_URL: postgresql+psycopg://invoiceops:invoiceops@localhost:5432/invoiceops
+          DATABASE_URL: postgresql+psycopg://invoiceops:local-postgres-only-change-me@localhost:5432/invoiceops
           INVOICEOPS_RUN_LIVE_REDIS: "true"
           INVOICEOPS_LIVE_WORKER_LOG_DIR: ${{ github.workspace }}/artifacts/live-redis/worker-logs
         run: |

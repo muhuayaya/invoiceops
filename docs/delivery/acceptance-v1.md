@@ -12,7 +12,7 @@
 | 复核 SLA 与修订历史 | `tests/integration/test_api_flow.py`、`GET /api/v1/reviews/{ticket_id}/history` | 等待时长、逾期审计告警、第二次修订历史通过 |
 | 前端工作台构建 | `npm run check && npm run build` | 通过 |
 | XLM-R 训练、冻结评估与性能约束 | `docs/model/training-record-v3.json`、`docs/model/xlmr-evaluation-v3.json`、`docs/performance/performance-report-v1.json` | v3 离线评估通过；本机 5 并发压测 observed QPS=8.42、P95=635.16ms、错误率=0，5,000 字符和 10,000 行批次门禁通过；尚未打包到 serving 镜像 |
-| Redis/Celery 重启恢复 | `tests/integration/test_worker_recovery.py`、`tests/integration/test_live_celery_worker_recovery.py`、`docs/delivery/live-recovery-evidence-v1.json`、`docs/delivery/live-recovery-vm/` | phpstudy Redis + SQLite 及 VM Compose PostgreSQL + Redis 的真实 worker 重启均通过，唯一 run ID 核对无重复记录 |
-| 干净环境冷启动 | `docs/delivery/cold-start-evidence-v1.json`、`docs/delivery/compose-smoke-evidence-v1.json`、`docs/delivery/final-signoff-v1.md`、`docs/delivery/user-attestation-v1.json` | VM 内完整 Compose 冷启动、6 个长期服务健康检查和数据库迁移任务通过；独立成员门禁按用户授权确认完成 |
+| Redis/Celery 重启恢复 | `tests/integration/test_worker_recovery.py`、`tests/integration/test_live_celery_worker_recovery.py`、`docs/delivery/live-recovery-evidence-v1.json` | 本地 fallback 与 CI/受控 Compose 验证路径已覆盖；生产部署仍需在目标环境核对 worker 重启后无重复记录 |
+| 干净环境冷启动 | `docs/delivery/cold-start-evidence-v1.json`、`docs/delivery/compose-smoke-evidence-v1.json` | Compose 冷启动、6 个长期服务健康检查和数据库迁移流程均有可复现命令；生产环境仍需在目标主机重新执行 |
 
-最终状态：M0–M3 的 PoC 骨架、真实 XLM-R 训练/冻结评估、持久化仓储、异步恢复代码、复核闭环、管理员数据管理和 CI 配置已完成；当前本地门禁为 45 passed、1 skipped，v3 离线模型门禁已解除。VM 内完整 Compose、PostgreSQL/Redis worker 恢复和业务演示已通过；8.5、8.6 按用户授权确认完成。该授权不等同于生产就绪认证。
+最终状态：M0–M3 的 PoC 骨架、真实 XLM-R 训练/冻结评估、持久化仓储、异步恢复代码、复核闭环、管理员数据管理和 CI 配置已完成；当前本地门禁为 53 passed、1 skipped，v3 离线模型门禁已解除。项目仍是 PoC，生产环境需要在目标主机重新执行 Compose、PostgreSQL/Redis worker 恢复和业务验收。

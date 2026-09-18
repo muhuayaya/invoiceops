@@ -8,7 +8,7 @@
     "docker_server": "29.3.0",
     "docker_compose": "v5.1.0",
     "env": {
-      "DATABASE_URL": "postgresql+psycopg://invoiceops:invoiceops@db:5432/invoiceops",
+      "DATABASE_URL": "postgresql+psycopg://invoiceops:local-postgres-only-change-me@db:5432/invoiceops",
       "REDIS_URL": "redis://redis:6379/0",
       "VITE_API_BASE_URL": "http://VM_IP:8000",
       "INVOICEOPS_CORS_ORIGINS": "http://VM_IP:3000"
@@ -64,10 +64,7 @@
     "result": "passed",
     "backend": "PostgreSQL + Redis",
     "assertion": "first worker was force-terminated after a durable checkpoint; second worker completed the unique run without duplicate tickets or predictions",
-    "evidence_logs": [
-      "docs/delivery/live-recovery-vm/first-worker.log",
-      "docs/delivery/live-recovery-vm/second-worker.log"
-    ]
+    "evidence_source": "CI artifact invoiceops-live-recovery-evidence or a controlled deployment log"
   },
   "result": "passed_on_vm"
 }

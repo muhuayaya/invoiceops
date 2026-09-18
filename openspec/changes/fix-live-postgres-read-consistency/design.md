@@ -46,7 +46,7 @@
 
 1. 更新 API 仓储和读路由代码；
 2. 执行单元、集成和契约测试；
-3. 将变更后的源码同步到 VM `/home/itheima/invoiceops`；
+3. 将变更后的源码同步到 VM `/home/VM_USER/invoiceops`；
 4. 在 VM 执行 `docker compose up --build -d api worker`；
 5. 上传 CSV，确认批次完成后无需重启 API，人工复核、数据管理、审计和指标均可看到新数据；
 6. 如需回滚，使用上一版本 API/worker 镜像重新部署，PostgreSQL 数据卷无需删除。

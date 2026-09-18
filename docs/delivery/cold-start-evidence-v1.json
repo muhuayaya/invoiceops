@@ -1,21 +1,17 @@
 {
   "evidence_version": "cold-start-v1",
-  "environment": "C:\\Users\\muhua\\AppData\\Local\\Temp\\invoiceops-coldstart-v1",
+  "environment": "clean checkout (machine path omitted)",
   "python_locked_install": "passed",
-  "python_pytest": "45 passed, 1 skipped (live Redis test is opt-in)",
+  "python_pytest": "53 passed, 1 skipped (live Redis test is opt-in)",
   "frontend_clean_npm_ci": "passed",
   "frontend_clean_check": "passed",
   "frontend_clean_build": "passed",
-  "live_redis_celery_recovery_test": "passed locally with phpstudy Redis + SQLite and in VM Compose with PostgreSQL + Redis; CI artifact remains available for independent runner verification",
-  "compose_health_smoke": "passed_on_vm; 6 services healthy and business smoke evidence saved in compose-smoke-evidence-v1.json",
-  "docker_compose_start": "passed_on_vm: docker compose up --build -d",
+  "live_redis_celery_recovery_test": "covered by the opt-in integration test and CI job; external runtime evidence must be collected by the operator",
+  "compose_health_smoke": "reproducible through the documented Compose smoke flow",
+  "docker_compose_start": "docker compose up --build -d",
   "production_cold_start": false,
-  "independent_member_cold_start": false,
-  "independent_member_cold_start_attestation": {
-    "status": "accepted_by_user_authorization",
-    "authorized_at": "2026-09-16",
-    "independent_machine_raw_log": false,
-    "note": "The user explicitly authorized treating the independent-member cold-start and sign-off as completed."
-  },
-  "blocking_reason": null
+  "limitations": [
+    "This file records PoC validation scope only; it is not a production certification.",
+    "A clean external environment should rerun the Compose and live-worker checks before production use."
+  ]
 }

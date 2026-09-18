@@ -22,7 +22,8 @@ def secret() -> str:
     configured = os.getenv("INVOICEOPS_JWT_SECRET", "local-development-secret-change-me")
     environment = os.getenv("INVOICEOPS_ENV", "development").lower()
     if environment not in DEVELOPMENT_ENVIRONMENTS and (
-        len(configured) < 32 or configured == "local-development-secret-change-me" or configured == "change-me-in-development"
+        len(configured) < 32
+        or configured in {"local-development-secret-change-me", "local-development-only-change-me", "change-me-in-development"}
     ):
         raise RuntimeError("INVOICEOPS_JWT_SECRET must be a random value of at least 32 characters outside development")
     return configured

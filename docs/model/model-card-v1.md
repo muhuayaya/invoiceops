@@ -1,8 +1,8 @@
-# InvoiceOps XLM-R 模型卡（v1）
+# InvoiceOps XLM-R 模型卡（离线候选，v1）
 
 ## 当前状态
 
-`offline_gate_passed_not_deployed`。真实 XLM-R v1/v2/v3 训练与冻结评估均已记录；v3 通过全部离线准入门槛。训练记录见 [`training-record-v1.json`](training-record-v1.json)、[`training-record-v2.json`](training-record-v2.json) 和 [`training-record-v3.json`](training-record-v3.json)，评估见对应 v1/v2/v3 报告。当前 API/Compose 镜像仍显式使用轻量 fallback，因为镜像不打包本地模型制品；v3 可在完成制品打包与 serving 配置后部署。
+`offline_gate_passed_not_deployed`。这是离线候选模型，不代表生产效果，也未部署到线上。真实 XLM-R v1/v2/v3 训练与冻结评估均已记录；v3 通过全部离线准入门槛。训练记录见 [`training-record-v1.json`](training-record-v1.json)、[`training-record-v2.json`](training-record-v2.json) 和 [`training-record-v3.json`](training-record-v3.json)，评估见对应 v1/v2/v3 报告。当前 API/Compose 镜像仍显式使用轻量 fallback，因为镜像不打包本地模型制品；v3 可在完成制品打包与 serving 配置后部署。
 
 ## 预期模型
 
@@ -28,7 +28,7 @@ v2 的 Macro-F1 为 0.8341、Micro-F1 为 0.8000，英文/中文 Macro-F1 差值
 
 ## 准入门槛
 
-Macro-F1 ≥ 0.80、Micro-F1 ≥ 0.85、`SUPPLIER_MASTER_CHANGE` recall ≥ 0.95、中英文 Macro-F1 差值 ≤ 0.08，且无 LLM 单条 P95 ≤ 800 ms。未实际测量的指标保持为空，不得推断为通过。
+Macro-F1 ≥ 0.80、Micro-F1 ≥ 0.85、`SUPPLIER_MASTER_CHANGE` recall ≥ 0.95、中英文 Macro-F1 差值 ≤ 0.08；若启用 LLM 辅助，单条 P95 ≤ 800 ms，当前 LLM 默认关闭。未实际测量的指标保持为空，不得推断为通过。
 
 ## 已知限制
 

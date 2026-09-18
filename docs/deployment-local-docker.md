@@ -9,7 +9,7 @@
 - Git；
 - 浏览器。
 
-本机不需要另外安装 PostgreSQL 或 Redis。项目不会使用 Windows 上 phpstudy_pro 的 Redis；Compose 会启动自己的 `db` 和 `redis` 服务。
+本机不需要另外安装 PostgreSQL 或 Redis。Compose 会启动项目自己的 `db` 和 `redis` 服务。
 
 检查环境：
 
@@ -32,7 +32,7 @@ Copy-Item .env.example .env
 ```ini
 VITE_API_BASE_URL=http://localhost:8000
 INVOICEOPS_CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
-DATABASE_URL=postgresql+psycopg://invoiceops:invoiceops@db:5432/invoiceops
+DATABASE_URL=postgresql+psycopg://invoiceops:local-postgres-only-change-me@db:5432/invoiceops
 REDIS_URL=redis://redis:6379/0
 ```
 
@@ -61,7 +61,7 @@ curl.exe --fail http://localhost:8000/readyz
 curl.exe --fail http://localhost:3000/
 ```
 
-默认演示账号：`admin/admin`、`reviewer/reviewer`、`observer/observer`。这些账号只适合本地演示，不能直接用于生产环境。
+默认演示账号：`admin/admin`、`reviewer/reviewer`、`observer/observer`。这些账号仅在 development/test 环境启用，不能直接用于生产环境。
 
 ## 4. 服务与数据卷
 
