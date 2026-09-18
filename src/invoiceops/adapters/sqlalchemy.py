@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, JSON, DateTime, Float, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, JSON, DateTime, Float, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint, Uuid
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -12,7 +12,7 @@ class Base(DeclarativeBase):
 
 class TicketRow(Base):
     __tablename__ = "tickets"
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True)
     request_id: Mapped[str] = mapped_column(String(128), unique=True, nullable=False)
     idempotency_key: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
     source: Mapped[str] = mapped_column(String(32), nullable=False)
@@ -28,8 +28,8 @@ class TicketRow(Base):
 
 class PredictionRow(Base):
     __tablename__ = "predictions"
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    ticket_id: Mapped[str] = mapped_column(ForeignKey("tickets.id"), nullable=False)
+    id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True)
+    ticket_id: Mapped[str] = mapped_column(Uuid(as_uuid=False), ForeignKey("tickets.id"), nullable=False)
     decision: Mapped[str] = mapped_column(String(32), nullable=False)
     labels: Mapped[list] = mapped_column(JSON, nullable=False)
     reason_codes: Mapped[list] = mapped_column(JSON, nullable=False)
@@ -48,7 +48,7 @@ class PredictionRow(Base):
 class PredictionLabelRow(Base):
     __tablename__ = "prediction_labels"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    prediction_id: Mapped[str] = mapped_column(ForeignKey("predictions.id"), nullable=False)
+    prediction_id: Mapped[str] = mapped_column(Uuid(as_uuid=False), ForeignKey("predictions.id"), nullable=False)
     label_code: Mapped[str] = mapped_column(String(64), nullable=False)
     score: Mapped[float] = mapped_column(Float, nullable=False)
     __table_args__ = (UniqueConstraint("prediction_id", "label_code"),)
@@ -56,8 +56,8 @@ class PredictionLabelRow(Base):
 
 class ReviewDecisionRow(Base):
     __tablename__ = "reviews"
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    ticket_id: Mapped[str] = mapped_column(ForeignKey("tickets.id"), nullable=False)
+    id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True)
+    ticket_id: Mapped[str] = mapped_column(Uuid(as_uuid=False), ForeignKey("tickets.id"), nullable=False)
     revision: Mapped[int] = mapped_column(Integer, nullable=False)
     labels: Mapped[list] = mapped_column(JSON, nullable=False)
     primary_queue: Mapped[str] = mapped_column(String(64), nullable=False)
@@ -80,7 +80,7 @@ class ModelVersionRow(Base):
 
 class AuditEventRow(Base):
     __tablename__ = "audit_events"
-    event_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    event_id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True)
     event_type: Mapped[str] = mapped_column(String(64), nullable=False)
     request_id: Mapped[str] = mapped_column(String(128), nullable=False)
     trace_id: Mapped[str] = mapped_column(String(64), nullable=False)
@@ -93,7 +93,7 @@ class AuditEventRow(Base):
 
 class OutboxEventRow(Base):
     __tablename__ = "outbox_events"
-    event_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    event_id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True)
     event_type: Mapped[str] = mapped_column(String(64), nullable=False)
     aggregate_id: Mapped[str] = mapped_column(String(128), nullable=False)
     payload: Mapped[dict] = mapped_column(JSON, nullable=False)
@@ -103,8 +103,8 @@ class OutboxEventRow(Base):
 
 class LLMSuggestionRow(Base):
     __tablename__ = "llm_suggestions"
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    ticket_id: Mapped[str] = mapped_column(ForeignKey("tickets.id"), nullable=False)
+    id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True)
+    ticket_id: Mapped[str] = mapped_column(Uuid(as_uuid=False), ForeignKey("tickets.id"), nullable=False)
     labels: Mapped[list] = mapped_column(JSON, nullable=False)
     rationale: Mapped[str] = mapped_column(Text, nullable=False)
     confidence: Mapped[float] = mapped_column(Float, nullable=False)
@@ -118,7 +118,7 @@ class LLMSuggestionRow(Base):
 
 class BatchJobRow(Base):
     __tablename__ = "batch_jobs"
-    batch_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    batch_id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True)
     status: Mapped[str] = mapped_column(String(32), nullable=False)
     total_rows: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     processed_rows: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
@@ -142,7 +142,7 @@ class IdempotencyRow(Base):
     key: Mapped[str] = mapped_column(String(255), primary_key=True)
     fingerprint: Mapped[str] = mapped_column(String(64), nullable=False)
     response: Mapped[dict] = mapped_column(JSON, nullable=False)
-    ticket_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    ticket_id: Mapped[str | None] = mapped_column(Uuid(as_uuid=False), nullable=True)
 
 
 def create_schema(engine) -> None:
