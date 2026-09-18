@@ -180,7 +180,7 @@ jobs:
       - name: Build web image
         run: docker build -f infra/docker/Dockerfile.web -t invoiceops-web:ci .
       - name: Scan images
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: invoiceops-api:ci
           format: table
@@ -188,14 +188,14 @@ jobs:
           ignore-unfixed: true
           severity: CRITICAL,HIGH
       - name: Scan worker image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: invoiceops-worker:ci
           exit-code: '1'
           ignore-unfixed: true
           severity: CRITICAL,HIGH
       - name: Scan web image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: invoiceops-web:ci
           exit-code: '1'
