@@ -30,5 +30,6 @@ ml/runs/
 *.sqlite3
 *.pem
 *.key
+docs/面试问题与回答-v1.md
 postgres-data/
 redis-data/

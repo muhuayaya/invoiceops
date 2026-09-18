@@ -64,9 +64,9 @@ InvoiceOps 采用“前端工作台 + FastAPI 业务 API + 领域服务 + 持久
 | Web 工作台 | `apps/web/` | 提供中文运营界面、角色菜单、表单、批次进度和结果展示 |
 | API 入口 | `apps/api/` | 暴露分类、批次、复核、审计、指标和管理员数据管理接口 |
 | 领域层 | `src/invoiceops/` | 执行脱敏、分类、风险判断、路由、复核、审计和权限规则 |
-| Worker | `apps/worker/`、`src/invoiceops/batch.py`、`src/invoiceops/batch_store.py` | 消费 Celery 批次任务，记录进度、失败原因和可恢复检查点 |
-| 持久化 | `src/invoiceops/adapters/`、`src/invoiceops/batch_store.py` | 支持 PostgreSQL 主存储和无 `DATABASE_URL` 时的 SQLite fallback |
-| 模型与评估 | `src/invoiceops/ml_runtime/`、`ml/` | 线上使用可解释关键词 fallback；离线保留 TF-IDF 与 XLM-R 训练评估链路 |
+| Worker | `apps/worker/`、`src/invoiceops/batch/` | 消费 Celery 批次任务，记录进度、失败原因和可恢复检查点 |
+| 持久化 | `src/invoiceops/repositories/` | 支持 PostgreSQL 主存储和无 `DATABASE_URL` 时的 SQLite fallback |
+| 模型与评估 | `src/invoiceops/model/`、`ml/` | 线上使用可解释关键词 fallback；离线保留 TF-IDF 与 XLM-R 训练评估链路 |
 | 基础设施 | `infra/`、`docker-compose.yml` | 提供镜像、Nginx、数据库迁移和 Compose 服务编排 |
 
 ### 两条核心处理链路
