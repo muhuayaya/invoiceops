@@ -25,6 +25,57 @@ InvoiceOps 把工单接入、分类、风险判断、责任队列推荐、批次
 | 模型 | 线上关键词规则 fallback；离线 TF-IDF baseline 和 XLM-R |
 | 交付 | Docker Compose、GitHub Actions、OpenSpec |
 
+## 项目架构
+
+InvoiceOps 采用“前端工作台 + FastAPI 业务 API + 领域服务 + 持久化/异步任务 + 可替换模型运行时”的分层架构。单条工单走同步 API，CSV 批次通过 Redis/Celery 投递给 worker；高风险或低置信度结果进入人工复核，复核、删除、覆盖和清理操作都会留下审计事件。
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│ React + TypeScript 工作台                                    │
+│ 单条分类 · 批次处理 · 人工复核 · 审计追踪 · 指标 · 数据管理     │
+└───────────────────────────────┬──────────────────────────────┘
+                                │ HTTP / JSON
+                                ▼
+┌──────────────────────────────────────────────────────────────┐
+│ FastAPI API 层                                                │
+│ JWT 认证与角色权限 · Pydantic 契约 · 健康检查 · 指标接口        │
+└───────────────┬──────────────────────┬───────────────────────┘
+                │                      │
+                ▼                      ▼
+┌─────────────────────────┐  ┌─────────────────────────────────┐
+│ 领域服务与模型运行时     │  │ 异步任务链路                     │
+│ 脱敏 · 分类 · 风险判断   │  │ API → Redis → Celery worker      │
+│ 路由 · 复核 · 审计        │  │ 批次进度、检查点与恢复             │
+└──────────┬──────────────┘  └────────────────┬────────────────┘
+           │                                  │
+           └────────────────┬─────────────────┘
+                            ▼
+┌──────────────────────────────────────────────────────────────┐
+│ 数据与基础设施                                                │
+│ PostgreSQL 业务数据 · SQLite 开发 fallback · Redis 队列        │
+│ Alembic 迁移 · MLflow 实验跟踪 · Nginx 静态资源                │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### 主要模块职责
+
+| 模块 | 代码位置 | 作用 |
+| --- | --- | --- |
+| Web 工作台 | `apps/web/` | 提供中文运营界面、角色菜单、表单、批次进度和结果展示 |
+| API 入口 | `apps/api/` | 暴露分类、批次、复核、审计、指标和管理员数据管理接口 |
+| 领域层 | `src/invoiceops/` | 执行脱敏、分类、风险判断、路由、复核、审计和权限规则 |
+| Worker | `apps/worker/`、`src/invoiceops/batch.py`、`src/invoiceops/batch_store.py` | 消费 Celery 批次任务，记录进度、失败原因和可恢复检查点 |
+| 持久化 | `src/invoiceops/adapters/`、`src/invoiceops/batch_store.py` | 支持 PostgreSQL 主存储和无 `DATABASE_URL` 时的 SQLite fallback |
+| 模型与评估 | `src/invoiceops/ml_runtime/`、`ml/` | 线上使用可解释关键词 fallback；离线保留 TF-IDF 与 XLM-R 训练评估链路 |
+| 基础设施 | `infra/`、`docker-compose.yml` | 提供镜像、Nginx、数据库迁移和 Compose 服务编排 |
+
+### 两条核心处理链路
+
+1. **单条工单**：Web 提交文本 → API 认证与脱敏 → 模型预测 → 风险/路由决策 → 持久化预测、工单和审计事件 → 必要时进入人工复核。
+2. **CSV 批次**：Web 上传 UTF-8 CSV → API 创建批次 → Redis/Celery 投递任务 → worker 逐行处理并记录成功/失败 → Web 轮询批次状态和逐行错误原因。
+
+完整部署时，PostgreSQL、Redis、MLflow、API、worker 和 Web 由 Docker Compose 管理；`migrate` 服务在 API/worker 启动前执行数据库迁移。模型和数据边界见[模型卡](docs/model/model-card-v1.md)与[数据卡](docs/data/data-card-v1.md)。
+
 ## 5 分钟启动：本机 Docker
 
 前置条件：Docker Engine/Docker Desktop、Docker Compose v2、Git 和浏览器。本机不需要单独安装 PostgreSQL 或 Redis，Compose 会启动项目自己的服务，并在 API/worker 启动前执行 Alembic 数据库迁移。
