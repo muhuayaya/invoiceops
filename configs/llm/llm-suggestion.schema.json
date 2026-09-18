@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["labels", "rationale", "confidence", "provider", "model", "prompt_version"],
+  "properties": {
+    "labels": {"type": "array", "items": {"type": "string", "enum": ["PRICE_VARIANCE", "QUANTITY_RECEIPT_VARIANCE", "TAX_CURRENCY_AMOUNT", "DUPLICATE_INVOICE", "MISSING_PO_OR_RECEIPT", "PAYMENT_STATUS", "SUPPLIER_MASTER_CHANGE", "OTHER_REVIEW"]}},
+    "rationale": {"type": "string", "maxLength": 2000},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "provider": {"type": "string"},
+    "model": {"type": "string"},
+    "prompt_version": {"type": "string"},
+    "cost_usd": {"type": "number", "minimum": 0}
+  }
+}

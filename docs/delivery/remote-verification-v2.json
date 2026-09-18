@@ -1,0 +1,46 @@
+{
+  "evidence_version": "remote-verification-v2",
+  "executed_at": "2026-09-17",
+  "environment": {
+    "vm_ip": "192.168.88.100",
+    "project_directory": "/home/itheima/invoiceops",
+    "compose_backend": "PostgreSQL",
+    "compose_queue": "Redis"
+  },
+  "deployment": {
+    "command": "docker compose up --build -d api worker web",
+    "result": "passed",
+    "services": ["api", "db", "mlflow", "redis", "web", "worker"]
+  },
+  "health": {
+    "api_healthz": 200,
+    "api_readyz": 200,
+    "web": 200,
+    "cors_preflight": 200,
+    "cors_allow_origin": "http://192.168.88.100:3000"
+  },
+  "runtime_contract": {
+    "web_bundle": "/assets/index-Bh_q5yAC.js",
+    "web_bundle_contains": ["数据管理", "批量覆盖", "批量删除", "修订历史", "已逾期"],
+    "openapi_history_path": true,
+    "openapi_admin_overwrite_path": true
+  },
+  "business_smoke": {
+    "created": 3,
+    "review_sla_fields_present": true,
+    "reviewer_identity_bound_to_jwt": true,
+    "review_history_revisions": [1, 2],
+    "overwritten": 2,
+    "overwrite_replay": 2,
+    "batch_deleted": 2,
+    "single_deleted": 1,
+    "reviewer_admin_status": 403,
+    "remaining_after_cleanup": 0
+  },
+  "sync_correction": {
+    "initial_failure": "remote TaxonomyCatalog lacked validate_queue and review submission returned 500",
+    "correction": "synced src/invoiceops/adapters/taxonomy.py and rebuilt api/worker",
+    "retest": "passed"
+  },
+  "result": "passed"
+}

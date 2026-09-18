@@ -1,0 +1,26 @@
+{
+  "evidence_version": "demo-v1",
+  "classification_status": 200,
+  "classification_decision": "needs_review",
+  "review_status": 201,
+  "audit_status": 200,
+  "audit_event_count": 4,
+  "batch_status": 200,
+  "batch_result": {
+    "batch_id": "eb4496e1-e5ee-4a83-bef1-532466147128",
+    "status": "completed",
+    "total_rows": 2,
+    "processed_rows": 2,
+    "success_rows": 1,
+    "failed_rows": 1,
+    "row_errors": [
+      {
+        "row_number": 3,
+        "code": "ValueError",
+        "message": "request_id and text are required"
+      }
+    ]
+  },
+  "metrics_status": 200,
+  "passed": true
+}

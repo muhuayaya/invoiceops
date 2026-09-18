@@ -1,0 +1,243 @@
+{
+  "micro_f1": 0.7076923076923077,
+  "macro_f1": 0.5694444444444444,
+  "hamming_loss": 0.06785714285714285,
+  "per_label": {
+    "PRICE_VARIANCE": {
+      "precision": 1.0,
+      "recall": 0.8,
+      "f1": 0.8888888888888888,
+      "support": 5
+    },
+    "QUANTITY_RECEIPT_VARIANCE": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 5
+    },
+    "TAX_CURRENCY_AMOUNT": {
+      "precision": 1.0,
+      "recall": 0.8,
+      "f1": 0.8888888888888888,
+      "support": 5
+    },
+    "DUPLICATE_INVOICE": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 5
+    },
+    "MISSING_PO_OR_RECEIPT": {
+      "precision": 1.0,
+      "recall": 0.8,
+      "f1": 0.8888888888888888,
+      "support": 5
+    },
+    "PAYMENT_STATUS": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 7
+    },
+    "SUPPLIER_MASTER_CHANGE": {
+      "precision": 1.0,
+      "recall": 0.8,
+      "f1": 0.8888888888888888,
+      "support": 5
+    },
+    "OTHER_REVIEW": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 5
+    }
+  },
+  "language_groups": {
+    "en": {
+      "micro_f1": 0.9090909090909091,
+      "macro_f1": 0.4583333333333333,
+      "hamming_loss": 0.025,
+      "per_label": {
+        "PRICE_VARIANCE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "QUANTITY_RECEIPT_VARIANCE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "TAX_CURRENCY_AMOUNT": {
+          "precision": 1.0,
+          "recall": 0.8,
+          "f1": 0.8888888888888888,
+          "support": 5
+        },
+        "DUPLICATE_INVOICE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "MISSING_PO_OR_RECEIPT": {
+          "precision": 1.0,
+          "recall": 0.8,
+          "f1": 0.8888888888888888,
+          "support": 5
+        },
+        "PAYMENT_STATUS": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 3
+        },
+        "SUPPLIER_MASTER_CHANGE": {
+          "precision": 1.0,
+          "recall": 0.8,
+          "f1": 0.8888888888888888,
+          "support": 5
+        },
+        "OTHER_REVIEW": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      }
+    },
+    "mixed": {
+      "micro_f1": 0.9090909090909091,
+      "macro_f1": 0.2361111111111111,
+      "hamming_loss": 0.025,
+      "per_label": {
+        "PRICE_VARIANCE": {
+          "precision": 1.0,
+          "recall": 0.8,
+          "f1": 0.8888888888888888,
+          "support": 5
+        },
+        "QUANTITY_RECEIPT_VARIANCE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "TAX_CURRENCY_AMOUNT": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "DUPLICATE_INVOICE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "MISSING_PO_OR_RECEIPT": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "PAYMENT_STATUS": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 1
+        },
+        "SUPPLIER_MASTER_CHANGE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "OTHER_REVIEW": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      }
+    },
+    "zh": {
+      "micro_f1": 0.2857142857142857,
+      "macro_f1": 0.125,
+      "hamming_loss": 0.125,
+      "per_label": {
+        "PRICE_VARIANCE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "QUANTITY_RECEIPT_VARIANCE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 5
+        },
+        "TAX_CURRENCY_AMOUNT": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "DUPLICATE_INVOICE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 5
+        },
+        "MISSING_PO_OR_RECEIPT": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "PAYMENT_STATUS": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 3
+        },
+        "SUPPLIER_MASTER_CHANGE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "OTHER_REVIEW": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 5
+        }
+      }
+    }
+  },
+  "latency": {
+    "count": 35,
+    "p50_ms": 0.6296999999904074,
+    "p95_ms": 0.7556000018666964,
+    "mean_ms": 0.6404228571877216
+  },
+  "model_size_bytes": 127949,
+  "model": {
+    "name": "tfidf-char-wb+one-vs-rest-logistic-regression",
+    "feature": {
+      "analyzer": "char_wb",
+      "ngram_range": [
+        3,
+        5
+      ],
+      "sublinear_tf": true
+    },
+    "taxonomy_version": "invoiceops-v1",
+    "dataset_path": "ml\\data\\processed\\invoiceops-v1-dataset.csv",
+    "dataset_scope": "synthetic PoC candidates; not real enterprise data"
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "evidence_version": "demo-v2",
+  "classification_status": 200,
+  "classification_decision": "needs_review",
+  "classification_predictions": [
+    {
+      "label_code": "TAX_CURRENCY_AMOUNT",
+      "score": 0.65
+    },
+    {
+      "label_code": "PAYMENT_STATUS",
+      "score": 0.65
+    }
+  ],
+  "classification_reason_codes": [
+    "LOW_CONFIDENCE"
+  ],
+  "classification_route": {
+    "primary": "FINANCE_TAX",
+    "collaborators": [
+      "PROCUREMENT_OPERATIONS",
+      "SUPPLIER_HELPDESK",
+      "AP_REVIEW"
+    ],
+    "version": "routing-v1"
+  },
+  "classification_versions": {
+    "model": "keyword-baseline-0.1",
+    "threshold": "thresholds-v1",
+    "taxonomy": "invoiceops-v1"
+  },
+  "review_status": 201,
+  "audit_status": 200,
+  "audit_event_count": 4,
+  "batch_status": 200,
+  "batch_result": {
+    "batch_id": "ab9c8b31-424e-4d21-9244-e594645e846e",
+    "status": "completed",
+    "total_rows": 2,
+    "processed_rows": 2,
+    "success_rows": 1,
+    "failed_rows": 1,
+    "row_errors": [
+      {
+        "row_number": 3,
+        "code": "ValueError",
+        "message": "request_id and text are required"
+      }
+    ]
+  },
+  "metrics_status": 200,
+  "metrics_excerpt": "# TYPE invoiceops_tickets_total gauge\ninvoiceops_tickets_total 2\n# TYPE invoiceops_audit_events_total gauge\ninvoiceops_audit_events_total 7\n# TYPE invoiceops_error_rate gauge\ninvoiceops_error_rate 0.000000\n# TYPE invoiceops_latency_p95_ms gauge\ninvoiceops_latency_p95_ms 1.753\n# TYPE invoiceops_review_backlog gauge\ninvoiceops_review_backlog 1\n# TYPE invoiceops_llm_fallback_total counter\ninvoiceops_llm_fallback_total 0\n",
+  "passed": true
+}

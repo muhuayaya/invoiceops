@@ -1,0 +1,73 @@
+{
+  "evidence_version": "compose-smoke-v1",
+  "executed_at": "2026-09-16",
+  "environment": {
+    "host": "Docker VM",
+    "vm_ip": "192.168.88.100",
+    "project_directory": "/home/itheima/invoiceops",
+    "docker_server": "29.3.0",
+    "docker_compose": "v5.1.0",
+    "env": {
+      "DATABASE_URL": "postgresql+psycopg://invoiceops:invoiceops@db:5432/invoiceops",
+      "REDIS_URL": "redis://redis:6379/0",
+      "VITE_API_BASE_URL": "http://192.168.88.100:8000",
+      "INVOICEOPS_CORS_ORIGINS": "http://192.168.88.100:3000"
+    }
+  },
+  "command": "docker compose up --build -d",
+  "compose_config": "passed",
+  "services": {
+    "db": "healthy",
+    "redis": "healthy",
+    "mlflow": "healthy",
+    "api": "healthy",
+    "worker": "running",
+    "web": "healthy"
+  },
+  "health_checks": {
+    "api_healthz": "{\"status\":\"ok\"}",
+    "api_readyz": "{\"status\":\"ready\"}",
+    "web_external_http": 200,
+    "web_bundle_contains_api_endpoint": true
+  },
+  "metrics": {
+    "invoiceops_tickets_total": 2,
+    "invoiceops_audit_events_total": 8
+  },
+  "business_smoke": {
+    "classification_request_id": "vm-compose-final-20260916",
+    "prediction_count": 2,
+    "decision": "needs_review",
+    "ticket_id": "76d805cf-a4aa-46b5-8591-35597f0b4f2c",
+    "review_revision": 1,
+    "audit_event_count": 4,
+    "audit_event_types": [
+      "ticket.received",
+      "prediction.created",
+      "route.recommended",
+      "review.appended"
+    ],
+    "batch_id": "45a23fb3-f017-4c7c-9d55-b9811e3ee96e",
+    "batch_status": "completed",
+    "batch_total_rows": 3,
+    "batch_success_rows": 2,
+    "batch_failed_rows": 1,
+    "batch_row_error": "row 4: ValueError"
+  },
+  "postgresql_snapshot": {
+    "tickets": 6,
+    "distinct_request_ids": 6,
+    "predictions": 6,
+    "audit_events": 20
+  },
+  "worker_recovery": {
+    "result": "passed",
+    "backend": "PostgreSQL + Redis",
+    "assertion": "first worker was force-terminated after a durable checkpoint; second worker completed the unique run without duplicate tickets or predictions",
+    "evidence_logs": [
+      "docs/delivery/live-recovery-vm/first-worker.log",
+      "docs/delivery/live-recovery-vm/second-worker.log"
+    ]
+  },
+  "result": "passed_on_vm"
+}

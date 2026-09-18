@@ -1,0 +1,95 @@
+{
+  "$schema": "https://invoiceops.local/schemas/invoiceops-v1.schema.json",
+  "version": "invoiceops-v1",
+  "threshold_version": "thresholds-v1",
+  "labels": [
+    {
+      "code": "PRICE_VARIANCE",
+      "name": "价格差异",
+      "description": "采购订单与发票中的单价不一致。",
+      "risk": "medium",
+      "examples": [
+        "采购单 PO-1001 价格为 100 USD，但发票写成 120 USD。",
+        "PO price mismatch: the invoice unit price is higher than the agreed price."
+      ],
+      "thresholds": {"candidate_threshold": 0.45, "auto_accept_threshold": 0.75}
+    },
+    {
+      "code": "QUANTITY_RECEIPT_VARIANCE",
+      "name": "数量/收货差异",
+      "description": "发票数量与采购订单或实际收货数量不一致。",
+      "risk": "medium",
+      "examples": [
+        "我们只收货 8 件，发票却开了 10 件。",
+        "We received 8 units but the invoice bills 10."
+      ],
+      "thresholds": {"candidate_threshold": 0.45, "auto_accept_threshold": 0.75}
+    },
+    {
+      "code": "TAX_CURRENCY_AMOUNT",
+      "name": "税务/币种/金额异常",
+      "description": "发票税额、币种或金额存在异常。",
+      "risk": "high",
+      "examples": [
+        "发票的税额或币种金额不正确。",
+        "The VAT or currency total on the invoice is incorrect."
+      ],
+      "thresholds": {"candidate_threshold": 0.45, "auto_accept_threshold": 0.75}
+    },
+    {
+      "code": "DUPLICATE_INVOICE",
+      "name": "疑似重复发票",
+      "description": "同一发票可能被重复提交。",
+      "risk": "medium",
+      "examples": [
+        "发票 INV-1001 疑似重复提交，请核查。",
+        "Invoice INV-1001 appears to be a duplicate submission."
+      ],
+      "thresholds": {"candidate_threshold": 0.45, "auto_accept_threshold": 0.75}
+    },
+    {
+      "code": "MISSING_PO_OR_RECEIPT",
+      "name": "缺少采购或收货凭证",
+      "description": "处理发票所需的采购订单或收货凭证缺失。",
+      "risk": "medium",
+      "examples": [
+        "发票因缺少采购单或收货凭证而处于挂起状态。",
+        "The invoice is pending because the PO or receipt is missing."
+      ],
+      "thresholds": {"candidate_threshold": 0.45, "auto_accept_threshold": 0.75}
+    },
+    {
+      "code": "PAYMENT_STATUS",
+      "name": "付款状态咨询",
+      "description": "咨询发票或付款当前处理状态。",
+      "risk": "low",
+      "examples": [
+        "请确认发票 INV-1001 的付款状态。",
+        "Could you confirm the payment status for invoice INV-1001?"
+      ],
+      "thresholds": {"candidate_threshold": 0.45, "auto_accept_threshold": 0.75}
+    },
+    {
+      "code": "SUPPLIER_MASTER_CHANGE",
+      "name": "供应商主数据/收款信息变更",
+      "description": "请求修改供应商主数据或收款银行信息。",
+      "risk": "high",
+      "examples": [
+        "请变更供应商收款银行账户信息。",
+        "Please change the supplier bank account details for future payments."
+      ],
+      "thresholds": {"candidate_threshold": 0.45, "auto_accept_threshold": 0.75}
+    },
+    {
+      "code": "OTHER_REVIEW",
+      "name": "其他人工复核",
+      "description": "无法归入已定义类别或需要人工判断的问题。",
+      "risk": "medium",
+      "examples": [
+        "发票情况不明确，需要人工复核。",
+        "There is an unclear invoice issue; please review it manually."
+      ],
+      "thresholds": {"candidate_threshold": 0.45, "auto_accept_threshold": 0.75}
+    }
+  ]
+}

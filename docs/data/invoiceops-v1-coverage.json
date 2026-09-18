@@ -1,0 +1,70 @@
+{
+  "rows": 240,
+  "label_counts": {
+    "PRICE_VARIANCE": 30,
+    "QUANTITY_RECEIPT_VARIANCE": 30,
+    "TAX_CURRENCY_AMOUNT": 30,
+    "DUPLICATE_INVOICE": 30,
+    "MISSING_PO_OR_RECEIPT": 30,
+    "PAYMENT_STATUS": 72,
+    "SUPPLIER_MASTER_CHANGE": 30,
+    "OTHER_REVIEW": 30
+  },
+  "combination_counts": {
+    "DUPLICATE_INVOICE": 24,
+    "DUPLICATE_INVOICE+PAYMENT_STATUS": 6,
+    "MISSING_PO_OR_RECEIPT": 24,
+    "MISSING_PO_OR_RECEIPT+PAYMENT_STATUS": 6,
+    "OTHER_REVIEW": 24,
+    "OTHER_REVIEW+PAYMENT_STATUS": 6,
+    "PAYMENT_STATUS": 30,
+    "PAYMENT_STATUS+PRICE_VARIANCE": 6,
+    "PAYMENT_STATUS+QUANTITY_RECEIPT_VARIANCE": 6,
+    "PAYMENT_STATUS+SUPPLIER_MASTER_CHANGE": 6,
+    "PAYMENT_STATUS+TAX_CURRENCY_AMOUNT": 6,
+    "PRICE_VARIANCE": 24,
+    "QUANTITY_RECEIPT_VARIANCE": 24,
+    "SUPPLIER_MASTER_CHANGE": 24,
+    "TAX_CURRENCY_AMOUNT": 24
+  },
+  "language_counts": {
+    "en": 80,
+    "mixed": 90,
+    "zh": 70
+  },
+  "missing_labels": [],
+  "splits": {
+    "train": 170,
+    "dev": 35,
+    "test": 35
+  },
+  "split_ratios": {
+    "train": 0.7083333333333334,
+    "dev": 0.14583333333333334,
+    "test": 0.14583333333333334
+  },
+  "split_policy": {
+    "target_ratios": {
+      "train": 0.7,
+      "dev": 0.15,
+      "test": 0.15
+    },
+    "seed": 20260915,
+    "algorithm": "grouped_multilabel_split",
+    "actual_ratio_note": "Hard leakage groups make exact ratios infeasible for this 240-row fixture; actual counts are recorded above."
+  },
+  "dataset_version": "invoiceops-v1-dataset-20260915",
+  "artifacts": {
+    "processed_dataset": {
+      "path": "ml\\data\\processed\\invoiceops-v1-dataset.csv",
+      "sha256": "b273f1571f9c42d4a10320098fd590b91e21fbb01e0d864322880ea82a55ceae"
+    },
+    "challenge_set": {
+      "path": "docs\\data\\challenge-set-v1.csv",
+      "sha256": "caf8d0843e0b0aa70884837ed284d5c855d4fe8fe6bed473b13158330c019502"
+    },
+    "source_manifest": {
+      "path": "ml\\data\\source_manifest.json"
+    }
+  }
+}

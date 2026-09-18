@@ -1,0 +1,37 @@
+{
+  "registry_version": "model-registry-v1",
+  "active_alias": "keyword-baseline-0.1",
+  "previous_stable": null,
+  "models": [
+    {
+      "version": "keyword-baseline-0.1",
+      "model_type": "keyword-fallback",
+      "status": "active",
+      "threshold_version": "thresholds-v1",
+      "metrics_source": "not_a_model_acceptance_candidate",
+      "note": "Local deterministic fallback for API smoke tests; not XLM-R evidence."
+    },
+    {
+      "version": "invoiceops-xlm-r-20260916.3",
+      "model_type": "xlm-roberta-base-multilabel",
+      "status": "rejected",
+      "threshold_version": "dev-micro-f1-calibrated-v1",
+      "metrics_source": "docs/model/xlmr-evaluation-v2.json",
+      "metrics": {"macro_f1": 0.8340773809523809, "micro_f1": 0.8, "supplier_master_change_recall": 1.0, "bilingual_macro_delta": 0.0898809523809524, "p95_ms": 59.73210000001927},
+      "artifact": "ml/artifacts/xlmr-v2",
+      "artifact_model_sha256": "744c65036e55b96f8eff6674f7a81b4bd66dd34f77069c4e1cf3c8e04ab3ee7f",
+      "note": "Frozen test evaluation completed on the language-balanced dataset; micro-F1 gate failed, so active alias remains keyword-baseline-0.1."
+    },
+    {
+      "version": "invoiceops-xlm-r-20260916.4",
+      "model_type": "xlm-roberta-base-multilabel",
+      "status": "offline_gate_passed_not_deployed",
+      "threshold_version": "dev-micro-f1-calibrated-v1",
+      "metrics_source": "docs/model/xlmr-evaluation-v3.json",
+      "metrics": {"macro_f1": 1.0, "micro_f1": 1.0, "supplier_master_change_recall": 1.0, "bilingual_macro_delta": 0.0, "p95_ms": 117.65159999958996},
+      "artifact": "ml/artifacts/xlmr-v3",
+      "artifact_model_sha256": "bdc09ba087871035cc28ee659808fda7540457369bc115b031773bcfe9ab2878",
+      "note": "All frozen offline gates passed; serving remains on keyword-baseline-0.1 until the model artifact is packaged and the serving runtime is explicitly configured."
+    }
+  ]
+}

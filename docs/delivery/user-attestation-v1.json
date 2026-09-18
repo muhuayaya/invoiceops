@@ -1,0 +1,23 @@
+{
+  "attestation_version": "user-attestation-v1",
+  "attested_at": "2026-09-16",
+  "scope": [
+    "openspec task 8.5",
+    "openspec task 8.6",
+    "M0-M4 final sign-off"
+  ],
+  "attester": "用户授权确认（本会话）",
+  "authorization": "用户明确授权将另一名成员独立冷启动、最终演示和签字按已完成处理。",
+  "supporting_evidence": [
+    "docs/delivery/cold-start-evidence-v1.json",
+    "docs/delivery/compose-smoke-evidence-v1.json",
+    "docs/delivery/demo-evidence-v2.json",
+    "docs/delivery/cors-evidence-v1.json",
+    "docs/delivery/final-signoff-v1.md"
+  ],
+  "limitations": [
+    "未采集另一名成员机器的原始冷启动日志。",
+    "该确认不构成生产环境认证或真实企业收益证明。"
+  ],
+  "result": "accepted_by_user_authorization"
+}

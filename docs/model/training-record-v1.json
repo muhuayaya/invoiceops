@@ -1,0 +1,18 @@
+{
+  "record_version": "training-record-v1",
+  "status": "trained_not_promoted",
+  "artifact": "ml/artifacts/xlmr-v1",
+  "artifact_model_sha256": "99a284b786ae665bff971806d66b1d2b706ef84e36107e04f2f373c81b8af2b7",
+  "base_model": "FacebookAI/xlm-roberta-base",
+  "model_source_manifest": "docs/model/model-source-manifest-v1.json",
+  "taxonomy_version": "invoiceops-v1",
+  "dataset_version": "invoiceops-v1-dataset-20260915",
+  "dataset_sha256": "b273f1571f9c42d4a10320098fd590b91e21fbb01e0d864322880ea82a55ceae",
+  "split_counts": {"train": 170, "dev": 35, "test": 35},
+  "seed": 42,
+  "config": {"max_length": 256, "learning_rate": 0.00002, "epochs": 3, "batch_size": 16, "loss": "class-weighted BCEWithLogitsLoss"},
+  "epoch_losses": [1.1972313469106501, 1.1885583942586726, 1.1756934252652256],
+  "environment": {"platform": "Windows-11-10.0.26200-SP0", "python": "3.12.4", "torch": "2.5.1+cpu"},
+  "evaluation": "docs/model/xlmr-evaluation-v1.json",
+  "promotion": {"status": "rejected", "reason": "macro-F1, micro-F1, bilingual Macro-F1 delta and SUPPLIER_MASTER_CHANGE recall are outside gate"}
+}

@@ -1,0 +1,19 @@
+{
+  "version": "sources-v1",
+  "downloaded_at": "2026-09-15",
+  "sources": [
+    {"source_id": "banking77", "name": "BANKING77", "url": "https://huggingface.co/datasets/PolyAI/banking77", "license": "CC-BY-4.0", "purpose": "English financial-support expression reference", "prohibited_use": "Do not treat original single-label intents as invoice labels"},
+    {"source_id": "chinese-ambiguous-reference", "name": "Chinese-Ambiguous-Reference", "url": "https://github.com/ygan/Chinese-Ambiguous-Reference", "license": "MIT", "purpose": "Chinese customer-service wording and ambiguity examples", "prohibited_use": "Do not treat dialogue annotations as invoice labels"},
+    {"source_id": "invoiceops-synthetic", "name": "invoiceops-synthetic-v1", "url": "local://project-generated", "license": "project-generated", "purpose": "Primary PoC training and test candidates", "prohibited_use": "Not evidence of real enterprise performance"}
+  ],
+  "input_files": [
+    {
+      "path": "ml/data/generated/invoiceops-synthetic-v1.csv",
+      "source_id": "invoiceops-synthetic",
+      "sha256": "7bb33a843c740bf46897a467d2c3a6b6ee7e9a20413ba52387acc6ae6604bed0",
+      "license": "project-generated",
+      "purpose": "Primary PoC training and test candidates",
+      "prohibited_use": "Not evidence of real enterprise performance"
+    }
+  ]
+}

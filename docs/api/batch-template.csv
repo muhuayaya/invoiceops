@@ -1,0 +1,2 @@
+request_id,source,text,taxonomy_version,channel
+demo-001,email,"The invoice amount is wrong，而且我们还没有收到付款。",invoiceops-v1,supplier_portal

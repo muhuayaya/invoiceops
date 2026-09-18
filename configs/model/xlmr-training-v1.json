@@ -1,0 +1,19 @@
+{
+  "config_version": "xlmr-training-v1",
+  "base_model": "xlm-roberta-base",
+  "dataset_version": "invoiceops-v1-dataset-20260915",
+  "taxonomy_version": "invoiceops-v1",
+  "max_length": 256,
+  "seed": 42,
+  "learning_rate": 0.00002,
+  "epochs": 3,
+  "batch_size": 16,
+  "loss": "BCEWithLogitsLoss",
+  "promotion_gate": {
+    "macro_f1": 0.8,
+    "micro_f1": 0.85,
+    "supplier_master_change_recall": 0.95,
+    "language_macro_f1_delta": 0.08,
+    "p95_ms": 800
+  }
+}

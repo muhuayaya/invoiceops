@@ -1,0 +1,24 @@
+{
+  "status": "evaluated_offline_gate_passed_not_deployed",
+  "environment": {
+    "platform": "Windows local workstation",
+    "python": "3.12.4",
+    "llm_enabled": false,
+    "dataset_version": "invoiceops-v1-dataset-20260915"
+  },
+  "baseline": {
+    "report": "../data/invoiceops-v1-baseline-report.json",
+    "p95_ms": 1.1326,
+    "runs": 30
+  },
+  "xlmr": {
+    "status": "evaluated_offline_gate_passed_not_deployed",
+    "training_record": "training-record-v3.json",
+    "evaluation_report": "xlmr-evaluation-v3.json",
+    "metrics": {"macro_f1": 1.0, "micro_f1": 1.0, "hamming_loss": 0.0, "supplier_master_change_recall": 1.0},
+    "performance": {"runs": 500, "p50_ms": 88.33259999937582, "p95_ms": 117.65159999958996},
+    "promotion": "offline_gate_passed_not_deployed",
+    "language_groups": {"en": {"macro_f1": 0.5}, "zh": {"macro_f1": 0.5}, "mixed": {"macro_f1": 0.25}}
+  },
+  "gate": "XLM-R v3 passed Macro-F1, Micro-F1, critical recall, English/Chinese Macro-F1 delta and P95 gates on the frozen synthetic dataset. It is not deployed because the current API/Compose serving image intentionally excludes local model artifacts; keyword fallback remains active."
+}

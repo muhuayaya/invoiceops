@@ -1,0 +1,38 @@
+{
+  "report_version": "performance-v1",
+  "status": "local_poc_measurement",
+  "environment": {
+    "python": "current interpreter",
+    "hardware": "not pinned",
+    "model": "deterministic fallback"
+  },
+  "single_request": {
+    "count": 25,
+    "target_qps": 5,
+    "concurrency": 5,
+    "observed_qps": 8.416955505710492,
+    "max_text_chars": 5000,
+    "p50_ms": 442.8927000008116,
+    "p95_ms": 635.156399999687,
+    "error_rate": 0.0
+  },
+  "batch_10000": {
+    "rows": 10000,
+    "success_rows": 10000,
+    "failed_rows": 0,
+    "elapsed_ms": 2234.6491999996942,
+    "error_rate": 0.0
+  },
+  "resource_usage": {
+    "python_cpu_seconds": 2.921875,
+    "peak_tracemalloc_mb": 0.1672220230102539,
+    "os_container_metrics": "not collected"
+  },
+  "gates": {
+    "single_request_5qps": true,
+    "single_request_p95_800ms": true,
+    "text_5000_chars": true,
+    "batch_10000_rows": true,
+    "production_ready": false
+  }
+}

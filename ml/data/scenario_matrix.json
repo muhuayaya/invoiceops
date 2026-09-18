@@ -1,0 +1,22 @@
+{
+  "version": "synthetic-v1",
+  "template_version": "invoiceops-prompts-v1",
+  "coverage": {
+    "labels": ["PRICE_VARIANCE", "QUANTITY_RECEIPT_VARIANCE", "TAX_CURRENCY_AMOUNT", "DUPLICATE_INVOICE", "MISSING_PO_OR_RECEIPT", "PAYMENT_STATUS", "SUPPLIER_MASTER_CHANGE", "OTHER_REVIEW"],
+    "languages": ["zh", "en", "mixed"],
+    "variants": ["single_label", "multi_label", "negation", "typo", "unclear"],
+    "required_combinations": [
+      ["PRICE_VARIANCE", "PAYMENT_STATUS"],
+      ["TAX_CURRENCY_AMOUNT", "PAYMENT_STATUS"],
+      ["MISSING_PO_OR_RECEIPT", "QUANTITY_RECEIPT_VARIANCE"],
+      ["SUPPLIER_MASTER_CHANGE", "PAYMENT_STATUS"]
+    ]
+  },
+  "review_policy": {
+    "candidate_source": "public wording reference plus controlled synthetic templates",
+    "training_truth": "human_review_required",
+    "challenge_set_reviewers": 2,
+    "llm_generated_labels_allowed": false
+  },
+  "rule": "Each template, translation, near-duplicate, and supplier-context group must be assigned to exactly one data split."
+}

@@ -1,0 +1,594 @@
+{
+  "micro_f1": 0.0,
+  "macro_f1": 0.0,
+  "hamming_loss": 0.14166666666666666,
+  "per_label": {
+    "DUPLICATE_INVOICE": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 10
+    },
+    "MISSING_PO_OR_RECEIPT": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 0
+    },
+    "OTHER_REVIEW": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 0
+    },
+    "PAYMENT_STATUS": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 14
+    },
+    "PRICE_VARIANCE": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 0
+    },
+    "QUANTITY_RECEIPT_VARIANCE": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 10
+    },
+    "SUPPLIER_MASTER_CHANGE": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 0
+    },
+    "TAX_CURRENCY_AMOUNT": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 0
+    }
+  },
+  "language_groups": {
+    "en": {
+      "micro_f1": 0.0,
+      "macro_f1": 0.0,
+      "hamming_loss": 0.125,
+      "per_label": {
+        "DUPLICATE_INVOICE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "MISSING_PO_OR_RECEIPT": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "OTHER_REVIEW": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "PAYMENT_STATUS": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 10
+        },
+        "PRICE_VARIANCE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "QUANTITY_RECEIPT_VARIANCE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "SUPPLIER_MASTER_CHANGE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "TAX_CURRENCY_AMOUNT": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      }
+    },
+    "mixed": {
+      "micro_f1": 0.0,
+      "macro_f1": 0.0,
+      "hamming_loss": 0.15,
+      "per_label": {
+        "DUPLICATE_INVOICE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 10
+        },
+        "MISSING_PO_OR_RECEIPT": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "OTHER_REVIEW": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "PAYMENT_STATUS": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 4
+        },
+        "PRICE_VARIANCE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "QUANTITY_RECEIPT_VARIANCE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 10
+        },
+        "SUPPLIER_MASTER_CHANGE": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        },
+        "TAX_CURRENCY_AMOUNT": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 0
+        }
+      }
+    }
+  },
+  "thresholds": {
+    "DUPLICATE_INVOICE": 0.3,
+    "MISSING_PO_OR_RECEIPT": 0.3,
+    "OTHER_REVIEW": 0.3,
+    "PAYMENT_STATUS": 0.3,
+    "PRICE_VARIANCE": 0.3,
+    "QUANTITY_RECEIPT_VARIANCE": 0.3,
+    "SUPPLIER_MASTER_CHANGE": 0.3,
+    "TAX_CURRENCY_AMOUNT": 0.3
+  },
+  "performance": {
+    "runs": 10,
+    "p50_ms": 35.346799999842915,
+    "p95_ms": 43.640300000106436,
+    "mean_ms": 36.31592000001547,
+    "process_cpu_seconds": 1.0625,
+    "tracemalloc_peak_bytes": 16626
+  },
+  "error_analysis": {
+    "count": 30,
+    "examples": [
+      {
+        "request_id": "syn-duplicate_invoice-017",
+        "language": "mixed",
+        "actual_labels": [
+          "DUPLICATE_INVOICE"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.132144,
+          "MISSING_PO_OR_RECEIPT": 0.116498,
+          "OTHER_REVIEW": 0.153112,
+          "PAYMENT_STATUS": 0.239,
+          "PRICE_VARIANCE": 0.172145,
+          "QUANTITY_RECEIPT_VARIANCE": 0.108994,
+          "SUPPLIER_MASTER_CHANGE": 0.107227,
+          "TAX_CURRENCY_AMOUNT": 0.178492
+        }
+      },
+      {
+        "request_id": "syn-duplicate_invoice-002",
+        "language": "mixed",
+        "actual_labels": [
+          "DUPLICATE_INVOICE"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.132144,
+          "MISSING_PO_OR_RECEIPT": 0.116498,
+          "OTHER_REVIEW": 0.153112,
+          "PAYMENT_STATUS": 0.239,
+          "PRICE_VARIANCE": 0.172145,
+          "QUANTITY_RECEIPT_VARIANCE": 0.108994,
+          "SUPPLIER_MASTER_CHANGE": 0.107227,
+          "TAX_CURRENCY_AMOUNT": 0.178492
+        }
+      },
+      {
+        "request_id": "syn-payment_status-004",
+        "language": "en",
+        "actual_labels": [
+          "PAYMENT_STATUS"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.131956,
+          "MISSING_PO_OR_RECEIPT": 0.117295,
+          "OTHER_REVIEW": 0.154137,
+          "PAYMENT_STATUS": 0.251185,
+          "PRICE_VARIANCE": 0.164507,
+          "QUANTITY_RECEIPT_VARIANCE": 0.1122,
+          "SUPPLIER_MASTER_CHANGE": 0.11002,
+          "TAX_CURRENCY_AMOUNT": 0.175209
+        }
+      },
+      {
+        "request_id": "syn-payment_status-028",
+        "language": "en",
+        "actual_labels": [
+          "PAYMENT_STATUS"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.131956,
+          "MISSING_PO_OR_RECEIPT": 0.117295,
+          "OTHER_REVIEW": 0.154137,
+          "PAYMENT_STATUS": 0.251185,
+          "PRICE_VARIANCE": 0.164507,
+          "QUANTITY_RECEIPT_VARIANCE": 0.1122,
+          "SUPPLIER_MASTER_CHANGE": 0.11002,
+          "TAX_CURRENCY_AMOUNT": 0.175209
+        }
+      },
+      {
+        "request_id": "syn-payment_status-010",
+        "language": "en",
+        "actual_labels": [
+          "PAYMENT_STATUS"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.131956,
+          "MISSING_PO_OR_RECEIPT": 0.117295,
+          "OTHER_REVIEW": 0.154137,
+          "PAYMENT_STATUS": 0.251185,
+          "PRICE_VARIANCE": 0.164507,
+          "QUANTITY_RECEIPT_VARIANCE": 0.1122,
+          "SUPPLIER_MASTER_CHANGE": 0.11002,
+          "TAX_CURRENCY_AMOUNT": 0.175209
+        }
+      },
+      {
+        "request_id": "syn-duplicate_invoice-020",
+        "language": "mixed",
+        "actual_labels": [
+          "DUPLICATE_INVOICE",
+          "PAYMENT_STATUS"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.130097,
+          "MISSING_PO_OR_RECEIPT": 0.120007,
+          "OTHER_REVIEW": 0.149847,
+          "PAYMENT_STATUS": 0.270535,
+          "PRICE_VARIANCE": 0.168895,
+          "QUANTITY_RECEIPT_VARIANCE": 0.112842,
+          "SUPPLIER_MASTER_CHANGE": 0.115175,
+          "TAX_CURRENCY_AMOUNT": 0.16815
+        }
+      },
+      {
+        "request_id": "syn-quantity_receipt_variance-013",
+        "language": "mixed",
+        "actual_labels": [
+          "QUANTITY_RECEIPT_VARIANCE"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.142835,
+          "MISSING_PO_OR_RECEIPT": 0.117301,
+          "OTHER_REVIEW": 0.157562,
+          "PAYMENT_STATUS": 0.232188,
+          "PRICE_VARIANCE": 0.210464,
+          "QUANTITY_RECEIPT_VARIANCE": 0.120115,
+          "SUPPLIER_MASTER_CHANGE": 0.116841,
+          "TAX_CURRENCY_AMOUNT": 0.197551
+        }
+      },
+      {
+        "request_id": "syn-quantity_receipt_variance-025",
+        "language": "mixed",
+        "actual_labels": [
+          "PAYMENT_STATUS",
+          "QUANTITY_RECEIPT_VARIANCE"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.13238,
+          "MISSING_PO_OR_RECEIPT": 0.113419,
+          "OTHER_REVIEW": 0.145508,
+          "PAYMENT_STATUS": 0.259539,
+          "PRICE_VARIANCE": 0.182851,
+          "QUANTITY_RECEIPT_VARIANCE": 0.109304,
+          "SUPPLIER_MASTER_CHANGE": 0.109744,
+          "TAX_CURRENCY_AMOUNT": 0.177701
+        }
+      },
+      {
+        "request_id": "syn-duplicate_invoice-005",
+        "language": "mixed",
+        "actual_labels": [
+          "DUPLICATE_INVOICE",
+          "PAYMENT_STATUS"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.131661,
+          "MISSING_PO_OR_RECEIPT": 0.115396,
+          "OTHER_REVIEW": 0.152276,
+          "PAYMENT_STATUS": 0.272367,
+          "PRICE_VARIANCE": 0.171271,
+          "QUANTITY_RECEIPT_VARIANCE": 0.112495,
+          "SUPPLIER_MASTER_CHANGE": 0.107313,
+          "TAX_CURRENCY_AMOUNT": 0.172978
+        }
+      },
+      {
+        "request_id": "syn-duplicate_invoice-023",
+        "language": "mixed",
+        "actual_labels": [
+          "DUPLICATE_INVOICE"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.132144,
+          "MISSING_PO_OR_RECEIPT": 0.116498,
+          "OTHER_REVIEW": 0.153112,
+          "PAYMENT_STATUS": 0.239,
+          "PRICE_VARIANCE": 0.172145,
+          "QUANTITY_RECEIPT_VARIANCE": 0.108994,
+          "SUPPLIER_MASTER_CHANGE": 0.107227,
+          "TAX_CURRENCY_AMOUNT": 0.178492
+        }
+      },
+      {
+        "request_id": "syn-quantity_receipt_variance-007",
+        "language": "mixed",
+        "actual_labels": [
+          "QUANTITY_RECEIPT_VARIANCE"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.142835,
+          "MISSING_PO_OR_RECEIPT": 0.117301,
+          "OTHER_REVIEW": 0.157562,
+          "PAYMENT_STATUS": 0.232188,
+          "PRICE_VARIANCE": 0.210464,
+          "QUANTITY_RECEIPT_VARIANCE": 0.120115,
+          "SUPPLIER_MASTER_CHANGE": 0.116841,
+          "TAX_CURRENCY_AMOUNT": 0.197551
+        }
+      },
+      {
+        "request_id": "syn-quantity_receipt_variance-027",
+        "language": "mixed",
+        "actual_labels": [
+          "QUANTITY_RECEIPT_VARIANCE"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.142835,
+          "MISSING_PO_OR_RECEIPT": 0.117301,
+          "OTHER_REVIEW": 0.157562,
+          "PAYMENT_STATUS": 0.232188,
+          "PRICE_VARIANCE": 0.210464,
+          "QUANTITY_RECEIPT_VARIANCE": 0.120115,
+          "SUPPLIER_MASTER_CHANGE": 0.116841,
+          "TAX_CURRENCY_AMOUNT": 0.197551
+        }
+      },
+      {
+        "request_id": "syn-payment_status-018",
+        "language": "en",
+        "actual_labels": [
+          "PAYMENT_STATUS"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.131956,
+          "MISSING_PO_OR_RECEIPT": 0.117295,
+          "OTHER_REVIEW": 0.154137,
+          "PAYMENT_STATUS": 0.251185,
+          "PRICE_VARIANCE": 0.164507,
+          "QUANTITY_RECEIPT_VARIANCE": 0.1122,
+          "SUPPLIER_MASTER_CHANGE": 0.11002,
+          "TAX_CURRENCY_AMOUNT": 0.175209
+        }
+      },
+      {
+        "request_id": "syn-duplicate_invoice-008",
+        "language": "mixed",
+        "actual_labels": [
+          "DUPLICATE_INVOICE"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.132144,
+          "MISSING_PO_OR_RECEIPT": 0.116498,
+          "OTHER_REVIEW": 0.153112,
+          "PAYMENT_STATUS": 0.239,
+          "PRICE_VARIANCE": 0.172145,
+          "QUANTITY_RECEIPT_VARIANCE": 0.108994,
+          "SUPPLIER_MASTER_CHANGE": 0.107227,
+          "TAX_CURRENCY_AMOUNT": 0.178492
+        }
+      },
+      {
+        "request_id": "syn-payment_status-022",
+        "language": "en",
+        "actual_labels": [
+          "PAYMENT_STATUS"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.131956,
+          "MISSING_PO_OR_RECEIPT": 0.117295,
+          "OTHER_REVIEW": 0.154137,
+          "PAYMENT_STATUS": 0.251185,
+          "PRICE_VARIANCE": 0.164507,
+          "QUANTITY_RECEIPT_VARIANCE": 0.1122,
+          "SUPPLIER_MASTER_CHANGE": 0.11002,
+          "TAX_CURRENCY_AMOUNT": 0.175209
+        }
+      },
+      {
+        "request_id": "syn-payment_status-000",
+        "language": "en",
+        "actual_labels": [
+          "PAYMENT_STATUS"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.131956,
+          "MISSING_PO_OR_RECEIPT": 0.117295,
+          "OTHER_REVIEW": 0.154137,
+          "PAYMENT_STATUS": 0.251185,
+          "PRICE_VARIANCE": 0.164507,
+          "QUANTITY_RECEIPT_VARIANCE": 0.1122,
+          "SUPPLIER_MASTER_CHANGE": 0.11002,
+          "TAX_CURRENCY_AMOUNT": 0.175209
+        }
+      },
+      {
+        "request_id": "syn-payment_status-024",
+        "language": "en",
+        "actual_labels": [
+          "PAYMENT_STATUS"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.131956,
+          "MISSING_PO_OR_RECEIPT": 0.117295,
+          "OTHER_REVIEW": 0.154137,
+          "PAYMENT_STATUS": 0.251185,
+          "PRICE_VARIANCE": 0.164507,
+          "QUANTITY_RECEIPT_VARIANCE": 0.1122,
+          "SUPPLIER_MASTER_CHANGE": 0.11002,
+          "TAX_CURRENCY_AMOUNT": 0.175209
+        }
+      },
+      {
+        "request_id": "syn-payment_status-012",
+        "language": "en",
+        "actual_labels": [
+          "PAYMENT_STATUS"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.131956,
+          "MISSING_PO_OR_RECEIPT": 0.117295,
+          "OTHER_REVIEW": 0.154137,
+          "PAYMENT_STATUS": 0.251185,
+          "PRICE_VARIANCE": 0.164507,
+          "QUANTITY_RECEIPT_VARIANCE": 0.1122,
+          "SUPPLIER_MASTER_CHANGE": 0.11002,
+          "TAX_CURRENCY_AMOUNT": 0.175209
+        }
+      },
+      {
+        "request_id": "syn-quantity_receipt_variance-015",
+        "language": "mixed",
+        "actual_labels": [
+          "PAYMENT_STATUS",
+          "QUANTITY_RECEIPT_VARIANCE"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.13238,
+          "MISSING_PO_OR_RECEIPT": 0.113419,
+          "OTHER_REVIEW": 0.145508,
+          "PAYMENT_STATUS": 0.259539,
+          "PRICE_VARIANCE": 0.182851,
+          "QUANTITY_RECEIPT_VARIANCE": 0.109304,
+          "SUPPLIER_MASTER_CHANGE": 0.109744,
+          "TAX_CURRENCY_AMOUNT": 0.177701
+        }
+      },
+      {
+        "request_id": "syn-quantity_receipt_variance-021",
+        "language": "mixed",
+        "actual_labels": [
+          "QUANTITY_RECEIPT_VARIANCE"
+        ],
+        "predicted_labels": [],
+        "scores": {
+          "DUPLICATE_INVOICE": 0.142835,
+          "MISSING_PO_OR_RECEIPT": 0.117301,
+          "OTHER_REVIEW": 0.157562,
+          "PAYMENT_STATUS": 0.232188,
+          "PRICE_VARIANCE": 0.210464,
+          "QUANTITY_RECEIPT_VARIANCE": 0.120115,
+          "SUPPLIER_MASTER_CHANGE": 0.116841,
+          "TAX_CURRENCY_AMOUNT": 0.197551
+        }
+      }
+    ]
+  },
+  "model": {
+    "artifact_dir": "ml\\artifacts\\xlmr-v1",
+    "model_type": "xlm-roberta",
+    "base_model": "FacebookAI/xlm-roberta-base",
+    "label_names": [
+      "DUPLICATE_INVOICE",
+      "MISSING_PO_OR_RECEIPT",
+      "OTHER_REVIEW",
+      "PAYMENT_STATUS",
+      "PRICE_VARIANCE",
+      "QUANTITY_RECEIPT_VARIANCE",
+      "SUPPLIER_MASTER_CHANGE",
+      "TAX_CURRENCY_AMOUNT"
+    ],
+    "max_length": 256,
+    "parameter_count": 278049800,
+    "serialized_size_bytes": 1112223464
+  },
+  "dataset": {
+    "path": "ml\\data\\processed\\invoiceops-v1-dataset.csv",
+    "version": "invoiceops-v1-dataset-20260915",
+    "sha256": "1c431e31e235a13ab11601a587c34149212982d06b45edd2405c27630bdf8304",
+    "train_rows": 180,
+    "dev_rows": 30,
+    "test_rows": 30
+  },
+  "environment": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.4",
+    "cpu_count": 20,
+    "llm_enabled": false,
+    "runs_requested": 10
+  },
+  "gate": {
+    "macro_f1_ge_0_80": false,
+    "micro_f1_ge_0_85": false,
+    "supplier_master_recall_ge_0_95": false,
+    "p95_ms_le_800": true
+  },
+  "status": "evaluated"
+}

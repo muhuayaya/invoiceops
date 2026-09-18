@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://invoiceops.local/schemas/invoiceops-v1.routes.schema.json",
+  "title": "InvoiceOps v1 routing rules",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "version", "taxonomy_version", "routes"],
+  "properties": {
+    "$schema": {"type": "string", "format": "uri-reference"},
+    "version": {"const": "routing-v1"},
+    "taxonomy_version": {"const": "invoiceops-v1"},
+    "routes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "PRICE_VARIANCE",
+        "QUANTITY_RECEIPT_VARIANCE",
+        "TAX_CURRENCY_AMOUNT",
+        "DUPLICATE_INVOICE",
+        "MISSING_PO_OR_RECEIPT",
+        "PAYMENT_STATUS",
+        "SUPPLIER_MASTER_CHANGE",
+        "OTHER_REVIEW"
+      ],
+      "properties": {
+        "PRICE_VARIANCE": {"$ref": "#/$defs/route"},
+        "QUANTITY_RECEIPT_VARIANCE": {"$ref": "#/$defs/route"},
+        "TAX_CURRENCY_AMOUNT": {"$ref": "#/$defs/route"},
+        "DUPLICATE_INVOICE": {"$ref": "#/$defs/route"},
+        "MISSING_PO_OR_RECEIPT": {"$ref": "#/$defs/route"},
+        "PAYMENT_STATUS": {"$ref": "#/$defs/route"},
+        "SUPPLIER_MASTER_CHANGE": {"$ref": "#/$defs/route"},
+        "OTHER_REVIEW": {"$ref": "#/$defs/route"}
+      }
+    }
+  },
+  "$defs": {
+    "queue": {
+      "type": "string",
+      "enum": [
+        "PROCUREMENT_OPERATIONS",
+        "RECEIPT_PROCUREMENT",
+        "FINANCE_TAX",
+        "AP_REVIEW",
+        "SUPPLIER_HELPDESK",
+        "MASTER_DATA_RISK",
+        "MANUAL_TRIAGE"
+      ]
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primary_queue", "collaborator_queues"],
+      "properties": {
+        "primary_queue": {"$ref": "#/$defs/queue"},
+        "collaborator_queues": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/queue"}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,2 @@
+{"record_id":"review-0001","dataset_version":"invoiceops-v1-dataset-20260915","reviewer":"reviewer-a","scope":"synthetic candidates","decision":"accepted_for_candidate","reviewed_at":"2026-09-15","notes":"Rules and templates reviewed; final training truth requires business-owner confirmation."}
+{"record_id":"challenge-0001","dataset_version":"invoiceops-v1-challenge-20260915","reviewer":"reviewer-a","second_reviewer":"reviewer-b","decision":"frozen_challenge_set","reviewed_at":"2026-09-15","notes":"Challenge examples are redacted and isolated from training split."}

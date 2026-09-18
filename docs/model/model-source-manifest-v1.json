@@ -1,0 +1,23 @@
+{
+  "manifest_version": "model-source-v1",
+  "model_id": "FacebookAI/xlm-roberta-base",
+  "source_url": "https://huggingface.co/FacebookAI/xlm-roberta-base",
+  "revision": "e73636d4f797dec63c3081bb6ed5c7b0bb3f2089",
+  "license": "MIT",
+  "downloaded_at": "2026-09-16",
+  "files": {
+    "model.safetensors": {
+      "sha256": "6fd4797bc397c3b8b55d6bb5740366b57e6a3ce91c04c77f22aafc0c128e6feb",
+      "size_bytes": 1115567652
+    },
+    "sentencepiece.bpe.model": {
+      "sha256": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865",
+      "size_bytes": 5069051
+    },
+    "tokenizer.json": {
+      "sha256": "a898ea75433890f6610f4e470b8ebeb0c21dce5c8dd61f892eb09eb5919d2e2c",
+      "size_bytes": 9096718
+    }
+  },
+  "usage": "Base encoder only; classification head is trained by InvoiceOps and must be evaluated before promotion."
+}

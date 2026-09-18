@@ -1,0 +1,26 @@
+{
+  "evidence_version": "admin-data-management-v1",
+  "executed_at": "2026-09-16",
+  "environment": {
+    "host": "Docker VM",
+    "vm_ip": "192.168.88.100",
+    "project_directory": "/home/itheima/invoiceops",
+    "backend": "PostgreSQL",
+    "queue": "Redis"
+  },
+  "operations": {
+    "admin_created": 3,
+    "admin_listed": 3,
+    "batch_overwritten": 2,
+    "batch_overwrite_replay": 2,
+    "single_deleted": 1,
+    "batch_deleted": 2,
+    "batch_delete_replay": 2,
+    "remaining_after_cleanup": 0
+  },
+  "authorization": {
+    "reviewer_admin_endpoint_status": 403,
+    "anonymous_admin_endpoint_status": 401
+  },
+  "result": "passed; synthetic smoke data was removed after verification"
+}

@@ -1,0 +1,195 @@
+name: invoiceops-ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: invoiceops
+          POSTGRES_USER: invoiceops
+          POSTGRES_PASSWORD: invoiceops
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U invoiceops -d invoiceops"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      REDIS_URL: redis://localhost:6379/0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements.lock
+      - name: Install OpenSpec CLI
+        run: npm install --global @fission-ai/openspec@1.13.0
+      - name: Lint
+        run: ruff check apps src ml tests scripts
+      - name: Compile and test
+        run: pytest -q
+      - name: Live Redis/Celery/PostgreSQL recovery
+        env:
+          DATABASE_URL: postgresql+psycopg://invoiceops:invoiceops@localhost:5432/invoiceops
+          INVOICEOPS_RUN_LIVE_REDIS: "true"
+          INVOICEOPS_LIVE_WORKER_LOG_DIR: ${{ github.workspace }}/artifacts/live-redis/worker-logs
+        run: |
+          mkdir -p artifacts/live-redis
+          set +e
+          pytest -q tests/integration/test_live_celery_worker_recovery.py \
+            --junitxml=artifacts/live-redis/junit.xml > artifacts/live-redis/pytest.log 2>&1
+          status=$?
+          cat artifacts/live-redis/pytest.log
+          exit $status
+      - name: Upload live recovery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: invoiceops-live-recovery-evidence
+          path: artifacts/live-redis
+          if-no-files-found: ignore
+      - name: Contract validation
+        run: openspec validate --all --strict --json
+      - name: Frontend checks
+        run: npm ci --ignore-scripts && npm run check && npm run build
+      - name: Secret scan
+        shell: bash
+        run: |
+          if rg -n --hidden --glob '!.git/**' --glob '!package-lock.json' '(AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|sk-[A-Za-z0-9]{20,})' .; then exit 1; fi
+  compose-smoke:
+    runs-on: ubuntu-latest
+    needs: checks
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start clean Compose environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/compose
+          cleanup() {
+            docker compose ps --all > artifacts/compose/docker-compose-ps.txt 2>&1 || true
+            docker compose logs --no-color --tail=200 > artifacts/compose/docker-compose-logs.txt 2>&1 || true
+            docker compose down --volumes --remove-orphans || true
+          }
+          trap cleanup EXIT
+          docker compose version > artifacts/compose/docker-compose-version.txt
+          docker compose config > artifacts/compose/docker-compose-config.yaml
+          docker compose up --build -d
+          for attempt in {1..30}; do
+            if curl --fail --silent http://localhost:8000/healthz >/dev/null \
+              && curl --fail --silent http://localhost:8000/readyz >/dev/null \
+              && curl --fail --silent http://localhost:3000/ >/dev/null; then
+              break
+            fi
+            if [[ "$attempt" == 30 ]]; then
+              docker compose ps
+              docker compose logs --no-color --tail=200
+              exit 1
+            fi
+            sleep 5
+          done
+          token=$(curl --fail --silent -X POST http://localhost:8000/api/v1/auth/token \
+            -H 'Content-Type: application/json' \
+            -d '{"username":"reviewer","password":"reviewer"}' \
+            | python -c 'import json,sys; print(json.load(sys.stdin)["access_token"])')
+          python -c 'import json; print(json.dumps({"role":"reviewer","token_received":True}))' > artifacts/compose/token-response-redacted.json
+          curl --fail --silent http://localhost:8000/api/v1/taxonomies/current \
+            -H "Authorization: Bearer ${token}" > artifacts/compose/taxonomy-response.json
+          curl --fail --silent -X POST http://localhost:8000/api/v1/classifications \
+            -H "Authorization: Bearer ${token}" \
+            -H 'Content-Type: application/json' \
+            -H 'Idempotency-Key: compose-classification-1' \
+            -d '{"request_id":"compose-classification-1","source":"email","text":"The invoice amount is wrong and payment is still pending.","taxonomy_version":"invoiceops-v1","metadata":{"channel":"email"}}' \
+            > artifacts/compose/classification-response.json
+          python -c 'import json; data=json.load(open("artifacts/compose/classification-response.json")); assert len(data["predictions"]) >= 2, data'
+          cat > artifacts/compose/demo.csv <<'EOF'
+          request_id,source,text,taxonomy_version
+          compose-batch-1,email,Payment status is pending,invoiceops-v1
+          compose-batch-2,email,Please confirm the payment status,invoiceops-v1
+          EOF
+          curl --fail --silent -X POST http://localhost:8000/api/v1/batches -H "Authorization: Bearer ${token}" -H 'Idempotency-Key: compose-batch-smoke-001' \
+            -F 'file=@artifacts/compose/demo.csv;type=text/csv' \
+            > artifacts/compose/batch-submit-response.json
+          batch_id=$(python -c 'import json; print(json.load(open("artifacts/compose/batch-submit-response.json"))["batch_id"])')
+          for attempt in {1..30}; do
+            curl --fail --silent "http://localhost:8000/api/v1/batches/${batch_id}" -H "Authorization: Bearer ${token}" \
+              > artifacts/compose/batch-status-${attempt}.json
+            batch_status=$(python -c 'import json; print(json.load(open("artifacts/compose/batch-status-'"${attempt}"'.json"))["status"])')
+            if [[ "$batch_status" == "completed" ]]; then
+              cp "artifacts/compose/batch-status-${attempt}.json" artifacts/compose/batch-final-response.json
+              break
+            fi
+            if [[ "$attempt" == 30 ]]; then
+              cat "artifacts/compose/batch-status-${attempt}.json"
+              exit 1
+            fi
+            sleep 5
+          done
+          if ! docker compose exec -T web sh -c 'grep -R "http://localhost:8000" /usr/share/nginx/html/assets >/dev/null'; then
+            echo "web bundle did not contain the Compose API endpoint"
+            exit 1
+          fi
+          docker compose ps
+      - name: Upload Compose evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: invoiceops-compose-evidence
+          path: artifacts/compose
+          if-no-files-found: ignore
+  containers:
+    runs-on: ubuntu-latest
+    needs: checks
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build API image
+        run: docker build -f infra/docker/Dockerfile.api -t invoiceops-api:ci .
+      - name: Build worker image
+        run: docker build -f infra/docker/Dockerfile.worker -t invoiceops-worker:ci .
+      - name: Build web image
+        run: docker build -f infra/docker/Dockerfile.web -t invoiceops-web:ci .
+      - name: Scan images
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: invoiceops-api:ci
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+      - name: Scan worker image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: invoiceops-worker:ci
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+      - name: Scan web image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: invoiceops-web:ci
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH

@@ -1,0 +1,11 @@
+{
+  "status": "baseline_policy_ready_xlmr_calibration_pending",
+  "taxonomy_version": "invoiceops-v1",
+  "threshold_version": "thresholds-v1",
+  "candidate_threshold": 0.45,
+  "auto_accept_threshold": 0.75,
+  "high_risk_labels": ["SUPPLIER_MASTER_CHANGE"],
+  "rejection_codes": ["LOW_CONFIDENCE", "HIGH_RISK_LABEL", "CONFLICTING_LABELS"],
+  "calibration_dataset": "dev split only",
+  "frozen_test_set_used": false
+}

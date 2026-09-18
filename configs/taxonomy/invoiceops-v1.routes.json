@@ -1,0 +1,39 @@
+{
+  "$schema": "https://invoiceops.local/schemas/invoiceops-v1.routes.schema.json",
+  "version": "routing-v1",
+  "taxonomy_version": "invoiceops-v1",
+  "routes": {
+    "PRICE_VARIANCE": {
+      "primary_queue": "PROCUREMENT_OPERATIONS",
+      "collaborator_queues": ["FINANCE_TAX"]
+    },
+    "QUANTITY_RECEIPT_VARIANCE": {
+      "primary_queue": "RECEIPT_PROCUREMENT",
+      "collaborator_queues": ["PROCUREMENT_OPERATIONS"]
+    },
+    "TAX_CURRENCY_AMOUNT": {
+      "primary_queue": "FINANCE_TAX",
+      "collaborator_queues": ["PROCUREMENT_OPERATIONS"]
+    },
+    "DUPLICATE_INVOICE": {
+      "primary_queue": "AP_REVIEW",
+      "collaborator_queues": []
+    },
+    "MISSING_PO_OR_RECEIPT": {
+      "primary_queue": "PROCUREMENT_OPERATIONS",
+      "collaborator_queues": ["RECEIPT_PROCUREMENT"]
+    },
+    "PAYMENT_STATUS": {
+      "primary_queue": "SUPPLIER_HELPDESK",
+      "collaborator_queues": ["AP_REVIEW"]
+    },
+    "SUPPLIER_MASTER_CHANGE": {
+      "primary_queue": "MASTER_DATA_RISK",
+      "collaborator_queues": ["AP_REVIEW"]
+    },
+    "OTHER_REVIEW": {
+      "primary_queue": "MANUAL_TRIAGE",
+      "collaborator_queues": []
+    }
+  }
+}

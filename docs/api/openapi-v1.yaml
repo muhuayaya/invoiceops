@@ -1,0 +1,696 @@
+openapi: 3.1.0
+info:
+  title: InvoiceOps API
+  version: 1.0.0
+  description: Contract for bilingual invoice and payment ticket triage.
+servers:
+  - url: http://localhost:8000
+tags:
+  - name: Classification
+  - name: Authentication
+  - name: Batches
+  - name: Reviews
+  - name: Admin Data
+  - name: Contracts
+  - name: Operations
+paths:
+  /api/v1/auth/token:
+    post:
+      tags: [Authentication]
+      summary: Issue a local PoC JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: {type: string, minLength: 1}
+                password: {type: string, minLength: 1}
+      responses:
+        '200':
+          description: Bearer token
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [access_token, token_type, role]
+                properties:
+                  access_token: {type: string}
+                  token_type: {type: string, const: bearer}
+                  role: {type: string, enum: [admin, reviewer, observer]}
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/v1/classifications:
+    post:
+      tags: [Classification]
+      summary: Classify one supplier ticket
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClassificationRequest'
+            example:
+              request_id: 9db8b9b1-7d2c-4d0e-8d4e-4f936d177a01
+              source: email
+              text: 请输入工单文本。
+              taxonomy_version: invoiceops-v1
+              metadata:
+                channel: supplier_portal
+      responses:
+        '200':
+          description: Classification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          $ref: '#/components/responses/IdempotencyConflict'
+  /api/v1/batches:
+    post:
+      tags: [Batches]
+      summary: Submit a UTF-8 CSV batch
+      security: [{bearerAuth: []}]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: UTF-8 CSV matching docs/api/batch-template.csv.
+      responses:
+        '202':
+          description: Batch accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchAccepted'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          $ref: '#/components/responses/IdempotencyConflict'
+  /api/v1/batches/{batch_id}:
+    get:
+      tags: [Batches]
+      summary: Get batch progress and row errors
+      security: [{bearerAuth: []}]
+      parameters:
+        - $ref: '#/components/parameters/BatchId'
+      responses:
+        '200':
+          description: Batch status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchStatus'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/v1/reviews:
+    get:
+      tags: [Reviews]
+      summary: List tickets awaiting human review
+      security: [{bearerAuth: []}]
+      parameters:
+        - in: query
+          name: risk
+          schema: {type: string, enum: [low, medium, high]}
+        - in: query
+          name: label_code
+          schema: {type: string}
+        - in: query
+          name: waiting_min_seconds
+          schema: {type: integer, minimum: 0}
+        - in: query
+          name: limit
+          schema: {type: integer, minimum: 1, maximum: 100, default: 50}
+      responses:
+        '200':
+          description: Review queue
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: {$ref: '#/components/schemas/ReviewItem'}
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/v1/reviews/{ticket_id}/history:
+    get:
+      tags: [Reviews]
+      summary: List immutable review revisions for a ticket
+      security: [{bearerAuth: []}]
+      parameters:
+        - $ref: '#/components/parameters/TicketId'
+      responses:
+        '200':
+          description: Review history
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: {$ref: '#/components/schemas/ReviewHistoryItem'}
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/v1/reviews/{ticket_id}/decisions:
+    post:
+      tags: [Reviews]
+      summary: Append a human review decision
+      security: [{bearerAuth: []}]
+      parameters:
+        - $ref: '#/components/parameters/TicketId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewDecisionRequest'
+      responses:
+        '201':
+          description: Decision appended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewDecisionResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/v1/admin/tickets:
+    post:
+      tags: [Admin Data]
+      summary: Enter one ticket as an administrator
+      security: [{bearerAuth: []}]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ClassificationRequest'}
+      responses:
+        '200':
+          description: Classified ticket
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ClassificationResponse'}
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/IdempotencyConflict'
+    get:
+      tags: [Admin Data]
+      summary: List administrator ticket summaries
+      security: [{bearerAuth: []}]
+      parameters:
+        - in: query
+          name: request_id
+          schema: {type: string, maxLength: 128}
+        - in: query
+          name: risk
+          schema: {type: string, enum: [low, medium, high]}
+        - in: query
+          name: status
+          schema: {type: string, enum: [received, classified, needs_review, reviewed]}
+        - in: query
+          name: limit
+          schema: {type: integer, minimum: 1, maximum: 100, default: 100}
+      responses:
+        '200':
+          description: Ticket summaries
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items: {type: array, items: {$ref: '#/components/schemas/AdminTicket'}}
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /api/v1/admin/tickets/{ticket_id}:
+    delete:
+      tags: [Admin Data]
+      summary: Delete one ticket as an administrator
+      security: [{bearerAuth: []}]
+      parameters:
+        - $ref: '#/components/parameters/TicketId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Deletion result
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AdminDeleteResponse'}
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/IdempotencyConflict'
+  /api/v1/admin/tickets/batch-delete:
+    post:
+      tags: [Admin Data]
+      summary: Delete multiple tickets as an administrator
+      security: [{bearerAuth: []}]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/AdminBatchDeleteRequest'}
+      responses:
+        '200':
+          description: Batch deletion result
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AdminDeleteResponse'}
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/IdempotencyConflict'
+  /api/v1/admin/tickets/batch-overwrite:
+    post:
+      tags: [Admin Data]
+      summary: Reclassify and replace multiple existing tickets
+      security: [{bearerAuth: []}]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/AdminBatchOverwriteRequest'}
+      responses:
+        '200':
+          description: Batch overwrite result
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AdminBatchOverwriteResponse'}
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/IdempotencyConflict'
+  /api/v1/admin/retention/cleanup:
+    post:
+      tags: [Admin Data]
+      summary: Redact expired ticket text as an administrator
+      security: [{bearerAuth: []}]
+      responses:
+        '200':
+          description: Retention cleanup result
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [cleaned_tickets, policy, audit_proof]
+                properties:
+                  cleaned_tickets: {type: integer, minimum: 0}
+                  policy: {type: string}
+                  audit_proof: {type: string}
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /api/v1/taxonomies/current:
+    get:
+      tags: [Contracts]
+      summary: Get the active taxonomy and routing versions
+      security: [{bearerAuth: []}]
+      responses:
+        '200':
+          description: Active taxonomy contract
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxonomyResponse'
+  /api/v1/audit/{request_id}:
+    get:
+      tags: [Contracts]
+      summary: Get the ordered audit chain for a request
+      security: [{bearerAuth: []}]
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Ordered audit events
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [request_id, events]
+                properties:
+                  request_id: {type: string}
+                  events:
+                    type: array
+                    items: {$ref: '#/components/schemas/AuditEvent'}
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /healthz:
+    get:
+      tags: [Operations]
+      summary: Liveness check
+      responses:
+        '200':
+          description: Process is alive
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/HealthResponse'}
+  /readyz:
+    get:
+      tags: [Operations]
+      summary: Readiness check
+      responses:
+        '200':
+          description: Required dependencies are ready
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/HealthResponse'}
+        '503':
+          description: A required dependency is unavailable
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ErrorResponse'}
+  /metrics:
+    get:
+      tags: [Operations]
+      summary: Prometheus metrics
+      responses:
+        '200':
+          description: Metrics exposition
+          content:
+            text/plain:
+              schema: {type: string}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    IdempotencyKey:
+      in: header
+      name: Idempotency-Key
+      required: true
+      description: Caller-generated key for safe retries.
+      schema: {type: string, minLength: 1, maxLength: 255}
+    BatchId:
+      in: path
+      name: batch_id
+      required: true
+      schema: {type: string, format: uuid}
+    TicketId:
+      in: path
+      name: ticket_id
+      required: true
+      schema: {type: string, format: uuid}
+    RequestId:
+      in: path
+      name: request_id
+      required: true
+      schema: {type: string, minLength: 1, maxLength: 128}
+  responses:
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    IdempotencyConflict:
+      description: Idempotency key was reused with a different request body
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    Forbidden:
+      description: Authenticated caller lacks permission
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ErrorResponse'}
+  schemas:
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [code, message, trace_id]
+      properties:
+        code: {type: string}
+        message: {type: string}
+        trace_id: {type: string}
+        details: {type: object}
+    ClassificationRequest:
+      type: object
+      additionalProperties: false
+      required: [request_id, source, text, taxonomy_version]
+      properties:
+        request_id: {type: string, minLength: 1, maxLength: 128}
+        source: {type: string, enum: [email, portal, api, manual]}
+        text: {type: string, minLength: 1, maxLength: 5000}
+        taxonomy_version: {type: string, const: invoiceops-v1}
+        metadata:
+          type: object
+          additionalProperties: false
+          properties:
+            channel: {type: string, enum: [supplier_portal, email, internal]}
+            locale: {type: string, enum: [zh, en, mixed]}
+    ClassificationResponse:
+      type: object
+      required: [request_id, decision, language, predictions, route, model_version, threshold_version, taxonomy_version, trace_id]
+      properties:
+        request_id: {type: string}
+        decision: {type: string, enum: [classified, needs_review]}
+        reason_codes:
+          type: array
+          items: {type: string}
+        language: {type: string, enum: [zh, en, mixed, unknown]}
+        predictions:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [label_code, score]
+            properties:
+              label_code: {type: string}
+              score: {type: number, minimum: 0, maximum: 1}
+        route:
+          type: object
+          required: [primary, collaborators, version]
+          properties:
+            primary: {type: string}
+            collaborators:
+              type: array
+              items: {type: string}
+            version: {type: string}
+        model_version: {type: string}
+        threshold_version: {type: string}
+        taxonomy_version: {type: string}
+        inference_ms: {type: number, minimum: 0}
+        trace_id: {type: string}
+    BatchAccepted:
+      type: object
+      required: [batch_id, status, trace_id]
+      properties:
+        batch_id: {type: string, format: uuid}
+        status: {type: string, enum: [queued, processing, completed, failed]}
+        trace_id: {type: string}
+    BatchStatus:
+      type: object
+      required: [batch_id, status, total_rows, processed_rows, success_rows, failed_rows, row_errors]
+      properties:
+        batch_id: {type: string, format: uuid}
+        status: {type: string, enum: [queued, processing, completed, failed, cancelled]}
+        total_rows: {type: integer, minimum: 0}
+        processed_rows: {type: integer, minimum: 0}
+        success_rows: {type: integer, minimum: 0}
+        failed_rows: {type: integer, minimum: 0}
+        row_errors:
+          type: array
+          items:
+            type: object
+            required: [row_number, code, message]
+            properties:
+              row_number: {type: integer, minimum: 2}
+              code: {type: string}
+              message: {type: string}
+    ReviewItem:
+      type: object
+      required: [ticket_id, request_id, risk, decision, predictions, reason_codes, primary_queue, collaborator_queues, waiting_seconds, overdue, review_sla_minutes]
+      properties:
+        ticket_id: {type: string, format: uuid}
+        request_id: {type: string}
+        risk: {type: string, enum: [low, medium, high]}
+        decision: {type: string, const: needs_review}
+        predictions: {type: array, items: {$ref: '#/components/schemas/LabelScore'}}
+        reason_codes: {type: array, items: {type: string}}
+        primary_queue: {type: string}
+        collaborator_queues: {type: array, items: {type: string}}
+        sanitized_text: {type: string}
+        waiting_seconds: {type: integer, minimum: 0}
+        overdue: {type: boolean}
+        review_sla_minutes: {type: integer, minimum: 1}
+    ReviewHistoryItem:
+      type: object
+      required: [ticket_id, revision, labels, primary_queue, note, reviewer_id, training_candidate, created_at, trace_id]
+      properties:
+        ticket_id: {type: string, format: uuid}
+        revision: {type: integer, minimum: 1}
+        labels: {type: array, items: {type: string}}
+        primary_queue: {type: string}
+        note: {type: string}
+        reviewer_id: {type: string}
+        training_candidate: {type: boolean}
+        created_at: {type: string, format: date-time}
+        trace_id: {type: string}
+    AdminTicket:
+      type: object
+      additionalProperties: false
+      required: [ticket_id, request_id, source, sanitized_text, language, risk, status, labels, primary_queue, created_at]
+      properties:
+        ticket_id: {type: string, format: uuid}
+        request_id: {type: string}
+        source: {type: string, enum: [email, portal, api, manual]}
+        sanitized_text: {type: string}
+        language: {type: string, enum: [zh, en, mixed, unknown]}
+        risk: {type: string, enum: [low, medium, high]}
+        status: {type: string, enum: [received, classified, needs_review, reviewed]}
+        labels: {type: array, items: {type: string}}
+        primary_queue: {type: string}
+        created_at: {type: string, format: date-time}
+    AdminBatchDeleteRequest:
+      type: object
+      additionalProperties: false
+      required: [ticket_ids]
+      properties:
+        ticket_ids:
+          type: array
+          minItems: 1
+          maxItems: 100
+          uniqueItems: true
+          items: {type: string, format: uuid}
+    AdminDeleteResponse:
+      type: object
+      required: [deleted_count, ticket_ids, trace_id]
+      properties:
+        deleted_count: {type: integer, minimum: 1}
+        ticket_ids: {type: array, items: {type: string, format: uuid}}
+        trace_id: {type: string}
+    AdminBatchOverwriteRequest:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items: {$ref: '#/components/schemas/ClassificationRequest'}
+    AdminBatchOverwriteResponse:
+      type: object
+      required: [overwritten_count, items, trace_id]
+      properties:
+        overwritten_count: {type: integer, minimum: 1}
+        items: {type: array, items: {$ref: '#/components/schemas/ClassificationResponse'}}
+        trace_id: {type: string}
+    LabelScore:
+      type: object
+      required: [label_code, score]
+      properties:
+        label_code: {type: string}
+        score: {type: number, minimum: 0, maximum: 1}
+    ReviewDecisionRequest:
+      type: object
+      additionalProperties: false
+      required: [labels, primary_queue]
+      properties:
+        labels: {type: array, minItems: 1, items: {type: string}}
+        primary_queue: {type: string}
+        note: {type: string, maxLength: 2000}
+    ReviewDecisionResponse:
+      type: object
+      required: [ticket_id, revision, labels, reviewer_id, trace_id]
+      properties:
+        ticket_id: {type: string, format: uuid}
+        revision: {type: integer, minimum: 1}
+        labels: {type: array, items: {type: string}}
+        reviewer_id: {type: string}
+        trace_id: {type: string}
+    TaxonomyResponse:
+      type: object
+      required: [taxonomy_version, routing_version, labels]
+      properties:
+        taxonomy_version: {type: string, const: invoiceops-v1}
+        routing_version: {type: string}
+        labels: {type: array, items: {type: object}}
+    AuditEvent:
+      type: object
+      additionalProperties: false
+      required: [event_id, event_type, event_version, occurred_at, request_id, trace_id, actor, subject, payload]
+      properties:
+        event_id: {type: string, format: uuid}
+        event_type: {type: string}
+        event_version: {type: string, const: '1'}
+        occurred_at: {type: string, format: date-time}
+        request_id: {type: string}
+        trace_id: {type: string}
+        actor: {type: object}
+        subject: {type: object}
+        payload: {type: object}
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status: {type: string, enum: [ok, ready]}

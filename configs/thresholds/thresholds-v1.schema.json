@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://invoiceops.local/schemas/thresholds-v1.schema.json",
+  "title": "InvoiceOps v1 threshold policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "candidate_threshold", "auto_accept_threshold", "high_risk_labels"],
+  "properties": {
+    "version": {"const": "thresholds-v1"},
+    "candidate_threshold": {"type": "number", "minimum": 0, "maximum": 1},
+    "auto_accept_threshold": {"type": "number", "minimum": 0, "maximum": 1},
+    "high_risk_labels": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": ["TAX_CURRENCY_AMOUNT", "SUPPLIER_MASTER_CHANGE"]
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+.git
+.venv
+node_modules
+dist
+build
+.pytest_cache
+.env
+.env.*
+!.env.example
+*.sqlite
+*.sqlite3
+*.db
+ml/data/generated
+ml/data/processed
+ml/artifacts
+*.pyc

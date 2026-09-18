@@ -1,0 +1,16 @@
+{
+  "evidence_version": "live-recovery-v1",
+  "executed_at": "2026-09-16",
+  "environment": "Windows host + phpstudy_pro Redis",
+  "redis_url": "redis://127.0.0.1:6379/0",
+  "database_backend": "SQLite test repository",
+  "command": "INVOICEOPS_RUN_LIVE_REDIS=true REDIS_URL=redis://127.0.0.1:6379/0 pytest -q tests/integration/test_live_celery_worker_recovery.py",
+  "result": "1 passed in 9.05s",
+  "verified": [
+    "The first Celery worker consumed the batch and reached a durable processing checkpoint",
+    "The first worker was force-terminated",
+    "A second worker recovered and completed the batch",
+    "Three tickets and three predictions were persisted without duplicate request IDs"
+  ],
+  "postgresql_compose_joint_validation": "passed_on_vm; see compose-smoke-evidence-v1.json and live-recovery-vm/"
+}

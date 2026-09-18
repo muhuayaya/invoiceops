@@ -1,0 +1,1 @@
+"""InvoiceOps FastAPI application."""
