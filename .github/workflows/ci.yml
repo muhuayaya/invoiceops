@@ -53,6 +53,10 @@ jobs:
         run: ruff check apps src ml tests scripts
       - name: Generate deterministic synthetic dataset
         run: python ml/data/generate_synthetic.py
+      - name: Prepare PostgreSQL schema
+        env:
+          DATABASE_URL: postgresql+psycopg://invoiceops:local-postgres-only-change-me@localhost:5432/invoiceops
+        run: alembic upgrade head
       - name: Compile and test
         run: pytest -q
       - name: Live Redis/Celery/PostgreSQL recovery
