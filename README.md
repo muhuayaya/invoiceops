@@ -1,12 +1,15 @@
-# InvoiceOps
+# InvoiceOps：多语言 NLP/AI 工单分流平台
 
-> 面向中英混合发票/付款工单的多标签分流与人工复核 PoC。
+> 面向中英混合发票/付款工单的多标签 NLP 分类、风险识别、责任队列推荐与人工复核 PoC。
 
-InvoiceOps 把工单接入、分类、风险判断、责任队列推荐、批次处理、人工复核、审计追踪、运营指标和管理员数据管理串成一个可运行的业务闭环。项目重点不只是一个文本分类模型，还包括权限、持久化、异步任务、恢复和 Docker Compose 部署。
+InvoiceOps 是一个以自然语言处理（NLP）和文本分类为核心的企业工单智能分流项目。系统面向中文、英文和中英混合的发票/付款工单，通过文本预处理、语言识别、多标签分类、风险判断和责任队列推荐，将非结构化工单转换为可运营的处理结果；高风险或低置信度结果进入人工复核，形成“AI 预测—人工决策—审计追踪—数据回流”的闭环。
+
+项目不仅验证模型效果，也覆盖 AI 系统落地所需的工程能力：数据脱敏、置信度与风险门控、模型版本管理、批次异步处理、人工复核、角色权限、持久化、任务恢复、可观测性和 Docker Compose 部署。
 
 ## 功能概览
 
-- 单条中英混合工单分类；
+- 单条中文、英文和中英混合工单的 NLP 多标签分类；
+- 基于文本特征、规则和模型版本的风险识别与责任队列推荐；
 - UTF-8 CSV 批次处理、进度和逐行失败原因；
 - 高风险/低置信度工单进入人工复核；
 - 复核决策、修订历史和审计事件；
@@ -22,7 +25,7 @@ InvoiceOps 把工单接入、分类、风险判断、责任队列推荐、批次
 | API | FastAPI、Pydantic、JWT |
 | 业务与存储 | Python、领域服务、PostgreSQL、SQLite fallback |
 | 异步任务 | Celery、Redis |
-| 模型 | 线上关键词规则 fallback；离线 TF-IDF baseline 和 XLM-R |
+| NLP/AI 模型 | 线上可解释关键词 baseline；离线 TF-IDF + Logistic Regression 和 XLM-R |
 | 交付 | Docker Compose、GitHub Actions、OpenSpec |
 
 ## 项目架构
@@ -64,9 +67,9 @@ InvoiceOps 采用“前端工作台 + FastAPI 业务 API + 领域服务 + 持久
 | Web 工作台 | `apps/web/` | 提供中文运营界面、角色菜单、表单、批次进度和结果展示 |
 | API 入口 | `apps/api/` | 暴露分类、批次、复核、审计、指标和管理员数据管理接口 |
 | 领域层 | `src/invoiceops/` | 执行脱敏、分类、风险判断、路由、复核、审计和权限规则 |
-| Worker | `apps/worker/`、`src/invoiceops/batch/` | 消费 Celery 批次任务，记录进度、失败原因和可恢复检查点 |
-| 持久化 | `src/invoiceops/repositories/` | 支持 PostgreSQL 主存储和无 `DATABASE_URL` 时的 SQLite fallback |
-| 模型与评估 | `src/invoiceops/model/`、`ml/` | 线上使用可解释关键词 fallback；离线保留 TF-IDF 与 XLM-R 训练评估链路 |
+| Worker | `apps/worker/`、`src/invoiceops/batch.py`、`src/invoiceops/batch_store.py` | 消费 Celery 批次任务，记录进度、失败原因和可恢复检查点 |
+| 持久化 | `src/invoiceops/adapters/`、`src/invoiceops/batch_store.py` | 支持 PostgreSQL 主存储和无 `DATABASE_URL` 时的 SQLite fallback |
+| 模型与评估 | `src/invoiceops/ml_runtime/`、`ml/` | 线上使用可解释关键词 fallback；离线保留 TF-IDF 与 XLM-R 训练评估链路 |
 | 基础设施 | `infra/`、`docker-compose.yml` | 提供镜像、Nginx、数据库迁移和 Compose 服务编排 |
 
 ### 两条核心处理链路
