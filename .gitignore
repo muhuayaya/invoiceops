@@ -13,6 +13,7 @@ htmlcov/
 node_modules/
 dist/
 build/
+项目介绍PPT/
 .env
 .env.*
 !.env.example
