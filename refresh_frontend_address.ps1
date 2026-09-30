@@ -1,12 +1,16 @@
 ﻿<#
 .SYNOPSIS
-  让前端访问地址跟随本机当前上网的网卡（有线/无线/热点）。
+  让前端访问地址跟随本机当前已连接的网卡（有线/无线/热点）。
 
 .DESCRIPTION
-  1. 找出当前默认路由（跃点数最小、已连接）的物理网卡 IPv4 地址；
-  2. 写入 .env 的 INVOICEOPS_HOST，并确保 INVOICEOPS_BIND_ADDRESS=0.0.0.0；
+  1. 找出所有已连接（链路已接通、有有效 IPv4）的物理网卡；
+  2. 写入 .env：
+     INVOICEOPS_ALLOWED_HOSTS = localhost 127.0.0.1 + 这些网卡的 IP（其他地址返回 421）
+     INVOICEOPS_HOST          = 当前上网网卡（默认路由跃点最小）的 IP，用于证书；
+                                没有网卡连接时为 127.0.0.1
+     INVOICEOPS_BIND_ADDRESS  = 0.0.0.0
   3. 有变化时只重建 proxy 容器（docker compose up -d --no-build --no-deps proxy），
-     Caddy 使用同一个本地 CA 为新 IP 签发证书，其他服务不受影响。
+     Caddy 使用同一个本地 CA 签发证书，其他服务不受影响。
 
 .EXAMPLE
   .\refresh_frontend_address.ps1                  # 检测并按需更新
@@ -38,28 +42,24 @@ function Write-Log([string]$Message) {
     } catch { }
 }
 
-function Get-InternetIPv4 {
-    # 当前真正用于上网的网卡：有默认网关、已连接、非虚拟网卡，路由跃点 + 接口跃点最小
+function Get-ConnectedIPv4 {
+    # 已连接的物理网卡（排除虚拟网卡、APIPA 地址）；有默认路由的按跃点排序在前
     $virtual = 'Hyper-V|WSL|VirtualBox|VMware|Loopback|Bluetooth|TAP-|Wintun|WireGuard'
-    $best = $null
-    $routes = Get-NetRoute -AddressFamily IPv4 -DestinationPrefix '0.0.0.0/0' -ErrorAction SilentlyContinue |
-        Where-Object { $_.NextHop -and $_.NextHop -ne '0.0.0.0' }
-    foreach ($route in $routes) {
-        $iface = Get-NetIPInterface -InterfaceIndex $route.InterfaceIndex -AddressFamily IPv4 -ErrorAction SilentlyContinue
-        if (-not $iface -or $iface.ConnectionState -ne 'Connected') { continue }
-        $adapter = Get-NetAdapter -InterfaceIndex $route.InterfaceIndex -ErrorAction SilentlyContinue
-        if (-not $adapter -or $adapter.Status -ne 'Up') { continue }
+    $result = @()
+    foreach ($adapter in @(Get-NetAdapter -ErrorAction SilentlyContinue)) {
+        if ($adapter.Status -ne 'Up' -or "$($adapter.MediaConnectionState)" -ne 'Connected') { continue }
         if ($adapter.InterfaceDescription -match $virtual -or $adapter.Name -match $virtual) { continue }
-        $ip = Get-NetIPAddress -InterfaceIndex $route.InterfaceIndex -AddressFamily IPv4 -ErrorAction SilentlyContinue |
+        $ip = Get-NetIPAddress -InterfaceIndex $adapter.ifIndex -AddressFamily IPv4 -ErrorAction SilentlyContinue |
             Where-Object { $_.IPAddress -notlike '169.254.*' -and $_.AddressState -eq 'Preferred' } |
             Select-Object -First 1
         if (-not $ip) { continue }
-        $metric = [int]$route.RouteMetric + [int]$iface.InterfaceMetric
-        if (-not $best -or $metric -lt $best.Metric) {
-            $best = [pscustomobject]@{ IP = $ip.IPAddress; Alias = $adapter.Name; Description = $adapter.InterfaceDescription; Metric = $metric }
-        }
+        $iface = Get-NetIPInterface -InterfaceIndex $adapter.ifIndex -AddressFamily IPv4 -ErrorAction SilentlyContinue
+        $route = Get-NetRoute -InterfaceIndex $adapter.ifIndex -AddressFamily IPv4 -DestinationPrefix '0.0.0.0/0' -ErrorAction SilentlyContinue |
+            Where-Object { $_.NextHop -and $_.NextHop -ne '0.0.0.0' } | Sort-Object RouteMetric | Select-Object -First 1
+        $metric = if ($route) { [int]$route.RouteMetric + [int]$iface.InterfaceMetric } else { 100000 + [int]$iface.InterfaceMetric }
+        $result += [pscustomobject]@{ IP = $ip.IPAddress; Alias = $adapter.Name; Description = $adapter.InterfaceDescription; Metric = $metric; Internet = [bool]$route }
     }
-    return $best
+    return @($result | Sort-Object Metric)
 }
 
 function Get-EnvValue([string[]]$Lines, [string]$Key) {
@@ -105,11 +105,18 @@ if ($InstallAutoRun) {
 # ---------- 检测并更新 ----------
 if (-not (Test-Path -LiteralPath $EnvFile)) { throw "找不到 $EnvFile，请先由 .env.example 复制并填写。" }
 
-$net = Get-InternetIPv4
-if (-not $net) {
-    Write-Log '未检测到可用于上网的网卡（可能正在切换网络），本次不做修改。'
-    return
+$nets = @(Get-ConnectedIPv4)
+if ($nets.Count -gt 0) {
+    $newHost = $nets[0].IP
+    foreach ($n in $nets) {
+        Write-Log ("已连接网卡：{0}（{1}） IP={2}{3}" -f $n.Alias, $n.Description, $n.IP, $(if ($n.Internet) { '，有默认网关' } else { '' }))
+    }
+} else {
+    $newHost = '127.0.0.1'
+    Write-Log '没有已连接的网卡（断网），只保留 localhost 访问。'
 }
+$allowed = @('localhost', '127.0.0.1') + @($nets | ForEach-Object { $_.IP }) | Select-Object -Unique
+$newAllowed = $allowed -join ' '
 
 $raw = [System.IO.File]::ReadAllText($EnvFile)
 $newline = if ($raw -match "`r`n") { "`r`n" } else { "`n" }
@@ -119,43 +126,47 @@ if ($lines.Count -gt 0 -and $lines[$lines.Count - 1] -eq '') { $lines.RemoveAt($
 
 $oldHost = Get-EnvValue $lines 'INVOICEOPS_HOST'
 $oldBind = Get-EnvValue $lines 'INVOICEOPS_BIND_ADDRESS'
+$oldAllowed = Get-EnvValue $lines 'INVOICEOPS_ALLOWED_HOSTS'
 $port = Get-EnvValue $lines 'INVOICEOPS_HTTPS_PORT'
 if (-not $port) { $port = '8443' }
 
-$envChanged = ($oldHost -ne $net.IP) -or ($oldBind -ne '0.0.0.0')
-Write-Log ("当前上网网卡：{0}（{1}） IP={2}" -f $net.Alias, $net.Description, $net.IP)
-Write-Log ("  .env：INVOICEOPS_HOST={0}  INVOICEOPS_BIND_ADDRESS={1}" -f $oldHost, $oldBind)
+$envChanged = ($oldHost -ne $newHost) -or ($oldBind -ne '0.0.0.0') -or ($oldAllowed -ne $newAllowed)
+Write-Log ("  .env 现值：HOST={0}  BIND={1}  ALLOWED={2}" -f $oldHost, $oldBind, $oldAllowed)
 
 if ($DryRun) {
-    if ($envChanged) { Write-Log "  [DryRun] 将改为 INVOICEOPS_HOST=$($net.IP)、INVOICEOPS_BIND_ADDRESS=0.0.0.0，并重建 proxy 容器" }
+    if ($envChanged) { Write-Log "  [DryRun] 将改为 HOST=$newHost  BIND=0.0.0.0  ALLOWED=$newAllowed，并重建 proxy 容器" }
     else { Write-Log '  [DryRun] .env 已是最新' }
     return
 }
 
 if ($envChanged) {
-    Set-EnvValue $lines 'INVOICEOPS_HOST' $net.IP
+    Set-EnvValue $lines 'INVOICEOPS_HOST' $newHost
     Set-EnvValue $lines 'INVOICEOPS_BIND_ADDRESS' '0.0.0.0'
+    Set-EnvValue $lines 'INVOICEOPS_ALLOWED_HOSTS' $newAllowed
     [System.IO.File]::WriteAllText($EnvFile, (($lines -join $newline) + $newline), [System.Text.UTF8Encoding]::new($false))
-    Write-Log "  已更新 .env：INVOICEOPS_HOST=$($net.IP)、INVOICEOPS_BIND_ADDRESS=0.0.0.0"
+    Write-Log "  已更新 .env：HOST=$newHost  BIND=0.0.0.0  ALLOWED=$newAllowed"
 }
 
 # 已是最新配置时 compose 不会重建容器；配置有变化时只重建 proxy。
 # 服务已停止时不擅自启动，只更新 .env，下次启动时生效。
 Push-Location $ProjectDir
+# docker 会把提示（如孤立容器警告）写到 stderr；Windows PowerShell 在 Stop 模式下会把它当成异常
+$ErrorActionPreference = 'Continue'
 try {
-    $running = & docker compose ps --status running -q proxy 2>&1
+    $running = @(& docker compose ps --status running -q proxy 2>$null)
     $code = $LASTEXITCODE
     if ($code -eq 0 -and -not $running) {
         Write-Log '  proxy 未在运行（服务已停止），只更新 .env，下次启动服务时生效。'
         return
     }
     if ($code -eq 0) {
-        $out = & docker compose up -d --no-build --no-deps proxy 2>&1
+        $out = @(& docker compose up -d --no-build --no-deps proxy 2>&1 | ForEach-Object { "$_" })
         $code = $LASTEXITCODE
-    } else { $out = $running }
-} finally { Pop-Location }
+    } else { $out = @(& docker compose ps proxy 2>&1 | ForEach-Object { "$_" }) }
+} finally { Pop-Location; $ErrorActionPreference = 'Stop' }
 if ($code -ne 0) {
     Write-Log "  docker compose 执行失败（Docker Desktop 是否已启动？）：$($out -join ' ')"
     exit 1
 }
-Write-Log "  proxy 已就绪。访问地址：https://$($net.IP):$port/  （本机也可用 https://localhost:$port/）"
+$urls = ($allowed | Where-Object { $_ -ne '127.0.0.1' } | ForEach-Object { "https://${_}:$port/" }) -join '  '
+Write-Log "  proxy 已就绪。可用地址：$urls"

@@ -5,6 +5,8 @@ services:
       - "${INVOICEOPS_BIND_ADDRESS:?Set the local LAN bind address}:${INVOICEOPS_HTTPS_PORT:-8443}:443"
     environment:
       INVOICEOPS_HOST: ${INVOICEOPS_HOST:?Set the local or LAN host name/IP}
+      INVOICEOPS_ALLOWED_HOSTS: ${INVOICEOPS_ALLOWED_HOSTS:-localhost *.*.*.*}
+      INVOICEOPS_HTTPS_PORT: ${INVOICEOPS_HTTPS_PORT:-8443}
     volumes:
       - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

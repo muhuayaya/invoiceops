@@ -190,7 +190,7 @@ uv run python -m ml.training train-xlmr --train data/invoiceops_train.csv --dev 
 
 5. 健康检查：`/healthz` 检查进程，`/readyz` 检查数据库与可用模型。
 
-6. 切换网络（有线/无线/热点）：`INVOICEOPS_BIND_ADDRESS=0.0.0.0` 时，本机任何网卡的 IP 都能访问，本机也可以一直用 `https://localhost:8443/`。运行下面的脚本，可把 `INVOICEOPS_HOST` 更新为当前上网网卡的 IP，只重建 `proxy` 容器，证书随之更新：
+6. 切换网络（有线/无线/热点）：本机始终可以用 `https://localhost:8443/` 访问。下面的脚本会检测当前已连接的网卡：把 `INVOICEOPS_ALLOWED_HOSTS` 设为 `localhost` 加上这些网卡的 IP（未连接网卡的 IP 返回 421），把 `INVOICEOPS_HOST`（证书地址）设为当前上网网卡的 IP（完全断网时为 `127.0.0.1`），并设置 `INVOICEOPS_BIND_ADDRESS=0.0.0.0`；配置有变化时只重建 `proxy` 容器：
 
    ```powershell
    .\refresh_frontend_address.ps1                  # 检测并按需更新
@@ -218,6 +218,7 @@ docker compose up -d --no-build api worker web
 | `INVOICEOPS_HOST` | 访问用主机名或 IP，会写入证书 | 必填 |
 | `INVOICEOPS_BIND_ADDRESS` | HTTPS 监听地址；`0.0.0.0` 表示所有网卡 | 必填 |
 | `INVOICEOPS_HTTPS_PORT` | HTTPS 端口 | `8443` |
+| `INVOICEOPS_ALLOWED_HOSTS` | 网关放行的主机名/IP（空格分隔），其余返回 421 | `localhost` 和任意 IPv4 |
 | `INVOICEOPS_DEMO_MODE` | 为 `true` 时，校验通过的模型无需 `approval.json` 即可上线，并自动创建默认管理员；为 `false` 时模型需要 `approval.json` | `true` |
 | `INVOICEOPS_DEMO_ADMIN_EMAIL` / `INVOICEOPS_DEMO_ADMIN_PASSWORD` | 默认管理员账号 | `admin@example.local` / `InvoiceopsDemo2026` |
 | `INVOICEOPS_PRIMARY_MODEL` / `INVOICEOPS_FALLBACK_MODEL` | 主、备模型目录 | `ml/artifacts/xlmr-v2` / `ml/artifacts/tfidf-v2` |

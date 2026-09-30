@@ -3,9 +3,16 @@
     default_sni {$INVOICEOPS_HOST}
 }
 
-# 最后的 :443 接收任意主机名/IP 的请求，本机切换有线/无线网络后新 IP 仍可访问
+# 末尾的 :443 接收任意主机名/IP 的请求，再由 INVOICEOPS_ALLOWED_HOSTS 决定哪些地址可用
 {$INVOICEOPS_HOST}:443, localhost:443, :443 {
     tls internal
+
+    # 只放行当前已连接网卡的 IP（由 refresh_frontend_address.ps1 维护）和 localhost；
+    # 未设置时 compose 默认放行 localhost 和任意 IPv4 地址
+    @unavailable not host {$INVOICEOPS_ALLOWED_HOSTS}
+    handle @unavailable {
+        respond "此地址对应的网卡当前未连接，请使用 https://localhost:{$INVOICEOPS_HTTPS_PORT:8443}/ 或当前网络的 IP 访问。" 421
+    }
 
     handle /healthz {
         reverse_proxy api:8000
