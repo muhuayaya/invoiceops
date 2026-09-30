@@ -139,11 +139,20 @@ if ($envChanged) {
     Write-Log "  已更新 .env：INVOICEOPS_HOST=$($net.IP)、INVOICEOPS_BIND_ADDRESS=0.0.0.0"
 }
 
-# 已是最新配置时 compose 不会重建容器；配置有变化时只重建 proxy
+# 已是最新配置时 compose 不会重建容器；配置有变化时只重建 proxy。
+# 服务已停止时不擅自启动，只更新 .env，下次启动时生效。
 Push-Location $ProjectDir
 try {
-    $out = & docker compose up -d --no-build --no-deps proxy 2>&1
+    $running = & docker compose ps --status running -q proxy 2>&1
     $code = $LASTEXITCODE
+    if ($code -eq 0 -and -not $running) {
+        Write-Log '  proxy 未在运行（服务已停止），只更新 .env，下次启动服务时生效。'
+        return
+    }
+    if ($code -eq 0) {
+        $out = & docker compose up -d --no-build --no-deps proxy 2>&1
+        $code = $LASTEXITCODE
+    } else { $out = $running }
 } finally { Pop-Location }
 if ($code -ne 0) {
     Write-Log "  docker compose 执行失败（Docker Desktop 是否已启动？）：$($out -join ' ')"
