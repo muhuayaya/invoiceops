@@ -9,6 +9,7 @@ services:
       INVOICEOPS_HTTPS_PORT: ${INVOICEOPS_HTTPS_PORT:-8443}
     volumes:
       - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./infra/caddy/certs:/etc/caddy/certs:ro
       - caddy_data:/data
       - caddy_config:/config
     depends_on:

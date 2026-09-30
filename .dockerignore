@@ -8,5 +8,6 @@ ml/pretrained
 ml/benchmarks
 infra/caddy/data
 infra/caddy/config
+infra/caddy/certs
 data
 tests

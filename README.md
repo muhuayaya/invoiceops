@@ -190,7 +190,7 @@ uv run python -m ml.training train-xlmr --train data/invoiceops_train.csv --dev 
 
 5. 健康检查：`/healthz` 检查进程，`/readyz` 检查数据库与可用模型。
 
-6. 切换网络（有线/无线/热点）：本机始终可以用 `https://localhost:8443/` 访问。下面的脚本会检测当前已连接的网卡：把 `INVOICEOPS_ALLOWED_HOSTS` 设为 `localhost` 加上这些网卡的 IP（未连接网卡的 IP 返回 421），把 `INVOICEOPS_HOST`（证书地址）设为当前上网网卡的 IP（完全断网时为 `127.0.0.1`），并设置 `INVOICEOPS_BIND_ADDRESS=0.0.0.0`；配置有变化时只重建 `proxy` 容器：
+6. 切换网络（有线/无线/热点）：本机始终可以用 `https://localhost:8443/` 访问。下面的脚本会检测当前已连接的网卡：把 `INVOICEOPS_ALLOWED_HOSTS` 设为 `localhost` 加上这些网卡的 IP（未连接网卡的 IP 返回 421），把 `INVOICEOPS_HOST`（证书地址）设为当前上网网卡的 IP（完全断网时为 `127.0.0.1`），并设置 `INVOICEOPS_BIND_ADDRESS=0.0.0.0`；同时用 Caddy 本地根证书签发一张包含 `localhost`、`127.0.0.1` 和这些 IP 的证书（`infra/caddy/certs/site.pem`），多个网卡同时连接时每个地址都没有证书提示，已导入的 `root.crt` 仍然有效。配置有变化时只重建或重启 `proxy` 容器：
 
    ```powershell
    .\refresh_frontend_address.ps1                  # 检测并按需更新

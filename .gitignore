@@ -27,3 +27,5 @@ ml/data_manifest.json
 infra/caddy/data/
 infra/caddy/config/
 infra/caddy/root.crt
+infra/caddy/certs/*
+!infra/caddy/certs/README.md

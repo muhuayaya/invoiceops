@@ -6,6 +6,7 @@ Caddy 反向代理配置，负责 HTTPS 入口。
 |---|---|
 | `Caddyfile` | 正式部署配置：使用本地 CA 签发证书；`/healthz`、`/readyz` 转发到 API，其余请求转发到 Streamlit 工作台 |
 | `Caddyfile.capacity` | 压测环境配置：额外转发 `/v1/*`、`/metrics` 和压测标识接口 |
+| `certs/` | `refresh_frontend_address.ps1` 生成的多地址证书 `site.pem`（含私钥，不纳入版本库），挂载到容器 `/etc/caddy/certs` |
 | `root.crt` | 从容器导出的本地 CA 公开根证书（不纳入版本库），供访问设备安装信任 |
 
 证书主机名由环境变量 `INVOICEOPS_HOST` 提供，同时签发 `localhost` 证书。用 IP 访问时浏览器不发送 SNI，Caddy 返回 `INVOICEOPS_HOST` 的证书（`default_sni`）。
