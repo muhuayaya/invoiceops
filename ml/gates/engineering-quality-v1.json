@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "gate_id": "invoiceops-engineering-quality-v1",
+  "frozen": true,
+  "frozen_at_utc": "2026-09-26T02:53:54Z",
+  "scope": "engineering_quality_only",
+  "dataset_version": "invoiceops-v1",
+  "taxonomy_version": "invoiceops-v1",
+  "test_split_sha256": "77140bab558d8f29367189b61221bf733fd90dc0186e6afdf9e540794a3cb2ce",
+  "candidate_models": {
+    "xlmr-c3d15da2f4d2": {
+      "role": "primary",
+      "manifest_sha256": "74e69bd48dd961ee90cfae9f81c72c371598b25fdd082fc01ccdd487e88b1b10",
+      "threshold_version": "xlmr-c3d15da2f4d2-dev-v1"
+    },
+    "tfidf-3fb0efe32633": {
+      "role": "fallback_candidate",
+      "manifest_sha256": "46e67ba2bc1c23b921a134dbfa2b17f9cb6d5076446af9946b224c759536539e",
+      "threshold_version": "tfidf-3fb0efe32633-dev-v1"
+    }
+  },
+  "criteria": {
+    "macro_f1": {
+      "operator": ">=",
+      "threshold": 0.8
+    },
+    "micro_f1": {
+      "operator": ">=",
+      "threshold": 0.85
+    },
+    "supplier_master_change_recall": {
+      "operator": ">=",
+      "threshold": 0.95
+    },
+    "zh_en_macro_f1_gap": {
+      "operator": "<=",
+      "threshold": 0.08
+    }
+  },
+  "all_criteria_required": true,
+  "evaluation_policy": {
+    "one_test_run_per_pinned_model_version": true,
+    "no_test_guided_tuning": true
+  },
+  "approval_effect": "none",
+  "separate_pending_gate": "target-environment latency and concurrency capacity"
+}

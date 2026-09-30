@@ -1,0 +1,97 @@
+services:
+  proxy:
+    image: caddy:2.10
+    ports:
+      - "${INVOICEOPS_BIND_ADDRESS:?Set the local LAN bind address}:${INVOICEOPS_HTTPS_PORT:-8443}:443"
+    environment:
+      INVOICEOPS_HOST: ${INVOICEOPS_HOST:?Set the local or LAN host name/IP}
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+      - api
+    restart: unless-stopped
+
+  web:
+    build: .
+    command: ["streamlit", "run", "apps/web/app.py", "--server.address=0.0.0.0", "--server.port=8501", "--server.headless=true"]
+    environment:
+      INVOICEOPS_API_URL: http://api:8000
+      PYTHONPATH: /app:/app/src
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  api:
+    build: .
+    command: ["sh", "-c", "alembic -c infra/migrations/alembic.ini upgrade head && if [ \"$$INVOICEOPS_DEMO_MODE\" = \"true\" ]; then python -m invoiceops.security.auth --email \"$$INVOICEOPS_DEMO_ADMIN_EMAIL\" --password-env INVOICEOPS_DEMO_ADMIN_PASSWORD --if-missing; fi && uvicorn apps.api.main:app --host 0.0.0.0 --port 8000"]
+    environment: &service_environment
+      INVOICEOPS_DATABASE_URL: postgresql+psycopg://invoiceops:${POSTGRES_PASSWORD:?Set a PostgreSQL password}@postgres:5432/invoiceops
+      INVOICEOPS_REDIS_URL: redis://redis:6379/0
+      INVOICEOPS_PRIMARY_MODEL: /app/ml/artifacts/xlmr-v2
+      INVOICEOPS_FALLBACK_MODEL: /app/ml/artifacts/tfidf-v2
+      INVOICEOPS_TAXONOMY: /app/configs/taxonomy.json
+      INVOICEOPS_MODEL_DEVICE: cpu
+      INVOICEOPS_MODEL_INFERENCE_TIMEOUT_SECONDS: ${INVOICEOPS_MODEL_INFERENCE_TIMEOUT_SECONDS:-10}
+      INVOICEOPS_MODEL_STARTUP_TIMEOUT_SECONDS: ${INVOICEOPS_MODEL_STARTUP_TIMEOUT_SECONDS:-180}
+      INVOICEOPS_DEMO_MODE: ${INVOICEOPS_DEMO_MODE:-true}
+      INVOICEOPS_DEMO_ADMIN_EMAIL: ${INVOICEOPS_DEMO_ADMIN_EMAIL:-admin@example.local}
+      INVOICEOPS_DEMO_ADMIN_PASSWORD: ${INVOICEOPS_DEMO_ADMIN_PASSWORD:-InvoiceopsDemo2026}
+    volumes:
+      - ./ml/artifacts:/app/ml/artifacts:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  worker:
+    build: .
+    user: "65534:65534"
+    command: ["celery", "-A", "apps.worker.tasks:celery_app", "worker", "--loglevel=INFO", "--beat", "--pool=solo", "--schedule=/tmp/celerybeat-schedule", "--concurrency=1"]
+    environment: *service_environment
+    volumes:
+      - ./ml/artifacts:/app/ml/artifacts:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: invoiceops
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a PostgreSQL password}
+      POSTGRES_DB: invoiceops
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invoiceops -d invoiceops"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.4
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  caddy_data:
+  caddy_config:
+

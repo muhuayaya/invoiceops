@@ -1,0 +1,12 @@
+.env
+.venv*
+.pytest_cache
+**/__pycache__
+**/*.pyc
+ml/artifacts
+ml/pretrained
+ml/benchmarks
+infra/caddy/data
+infra/caddy/config
+data
+tests

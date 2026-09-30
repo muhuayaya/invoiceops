@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: invoiceops
+      POSTGRES_PASSWORD: ${INVOICEOPS_CAPACITY_DB_PASSWORD:?}
+      POSTGRES_DB: invoiceops_capacity
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invoiceops -d invoiceops_capacity"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7.4
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  api:
+    image: ${INVOICEOPS_CAPACITY_IMAGE:?}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - HTTP_PROXY
+        - HTTPS_PROXY
+        - NO_PROXY
+    command:
+      - sh
+      - -c
+      - >-
+        alembic -c infra/migrations/alembic.ini upgrade head
+        && python -m ml.benchmark_api --model /bench-model --benchmark-only-unapproved-candidate
+    environment:
+      INVOICEOPS_DATABASE_URL: postgresql+psycopg://invoiceops:${INVOICEOPS_CAPACITY_DB_PASSWORD}@postgres:5432/invoiceops_capacity
+      INVOICEOPS_REDIS_URL: redis://redis:6379/0
+      INVOICEOPS_TAXONOMY: /app/configs/taxonomy.json
+      INVOICEOPS_BENCHMARK_ID: ${INVOICEOPS_CAPACITY_RUN_ID:?}
+      INVOICEOPS_MODEL_DEVICE: cpu
+      INVOICEOPS_MODEL_INFERENCE_TIMEOUT_SECONDS: "10"
+      INVOICEOPS_MODEL_STARTUP_TIMEOUT_SECONDS: "180"
+    volumes:
+      - type: bind
+        source: ${INVOICEOPS_CAPACITY_MODEL_PATH:?}
+        target: /bench-model
+        read_only: true
+    ports:
+      - target: 8000
+        published: "0"
+        protocol: tcp
+        host_ip: 127.0.0.1
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: "no"

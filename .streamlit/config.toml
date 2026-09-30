@@ -1,0 +1,37 @@
+# InvoiceOps 运营控制台主题：浅色工作区 + 深色导航侧栏。
+# 只使用系统字体，内网与离线环境无需下载字体。
+
+[theme]
+base = "light"
+primaryColor = "#1F5EFF"
+backgroundColor = "#F3F5F9"
+secondaryBackgroundColor = "#E9EEF6"
+textColor = "#14213D"
+borderColor = "#D6DDE8"
+dataframeBorderColor = "#DDE3EC"
+dataframeHeaderBackgroundColor = "#EEF2F8"
+showWidgetBorder = true
+baseRadius = "0.55rem"
+buttonRadius = "0.45rem"
+font = "Segoe UI, PingFang SC, Microsoft YaHei, Noto Sans CJK SC, sans-serif"
+codeFont = "Cascadia Code, Consolas, SFMono-Regular, monospace"
+headingFontWeights = [700, 650, 600, 600, 600, 600]
+metricValueFontWeight = 650
+greenColor = "#12A15A"
+orangeColor = "#E8860C"
+redColor = "#D93A3A"
+
+[theme.sidebar]
+backgroundColor = "#0E1A2E"
+secondaryBackgroundColor = "#17294A"
+textColor = "#C8D3E6"
+primaryColor = "#4C8DFF"
+borderColor = "#243A5E"
+codeBackgroundColor = "#17294A"
+
+[client]
+toolbarMode = "minimal"
+showSidebarNavigation = false
+
+[browser]
+gatherUsageStats = false

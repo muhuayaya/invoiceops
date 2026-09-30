@@ -1,0 +1,30 @@
+{
+    admin off
+    default_sni {$INVOICEOPS_HOST}
+}
+
+{$INVOICEOPS_HOST}:443, localhost:443 {
+    tls internal
+
+    handle /healthz {
+        reverse_proxy api:8000
+    }
+    handle /readyz {
+        reverse_proxy api:8000
+    }
+    handle /_benchmark/identity {
+        reverse_proxy api:8000
+    }
+    handle /v1/* {
+        reverse_proxy api:8000
+    }
+    handle /metrics {
+        reverse_proxy api:8000
+    }
+    handle /_stcore/health {
+        reverse_proxy web:8501
+    }
+    handle {
+        reverse_proxy web:8501
+    }
+}

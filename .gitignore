@@ -1,0 +1,29 @@
+# 本地环境与密钥
+.env
+.venv/
+.venv-*/
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# IDE 配置
+.idea/
+
+# 本地备份与运维记录（含数据库导出）
+.mcp-backup/
+
+# 大体积模型文件（预训练模型需自行下载，训练产物部署时挂载）
+ml/pretrained/
+ml/artifacts/
+
+# 运行时生成的报告与清单
+ml/benchmarks/
+ml/data_manifest.json
+
+# Caddy 运行数据与导出的证书
+infra/caddy/data/
+infra/caddy/config/
+infra/caddy/root.crt

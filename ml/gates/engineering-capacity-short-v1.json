@@ -1,0 +1,60 @@
+{
+  "gate_id": "engineering-capacity-short-v1",
+  "benchmark_type": "short_six_service_https_capacity",
+  "status": "short_profile",
+  "scope": {
+    "environment": "本机 Docker Desktop 与可信局域网",
+    "business_max_concurrent_users": 3,
+    "compose_services": ["proxy", "web", "api", "worker", "postgres", "redis"],
+    "access_origins": ["localhost HTTPS", "第二台受信任 Windows 局域网设备 HTTPS"],
+    "candidate_versions": ["xlmr-c3d15da2f4d2", "tfidf-3fb0efe32633"],
+    "candidate_roles_measured_separately": ["primary", "fallback"],
+    "workloads": ["single classification", "CSV batch through API and worker"],
+    "input_policy": "仅使用压测专用的中英文文本和 CSV，不读取业务数据"
+  },
+  "load_profile": {
+    "concurrency_levels": [1, 2, 3],
+    "warmup_seconds_per_level": 5,
+    "measurement_seconds_per_level": 15,
+    "steady_concurrency": 3,
+    "burst": {
+      "concurrency": 3,
+      "duration_seconds": 15
+    },
+    "soak": {
+      "concurrency": 3,
+      "duration_seconds": 30
+    },
+    "minimum_successful_valid_classification_requests_per_candidate": 100
+  },
+  "acceptance": {
+    "steady_state": {
+      "concurrency": 3,
+      "successful_throughput_requests_per_second_min": 1,
+      "p95_latency_ms_max": 5000,
+      "p99_latency_ms_max": 10000
+    },
+    "burst": {
+      "concurrency": 3,
+      "duration_seconds": 15,
+      "p95_latency_ms_max": 5000,
+      "p99_latency_ms_max": 10000
+    },
+    "valid_request_error_rate_max": 0.001,
+    "model_version_mismatches_max": 0,
+    "out_of_memory_events_max": 0,
+    "unexpected_container_restarts_max": 0,
+    "resources": {
+      "aggregate_container_memory_gib_max": 8,
+      "aggregate_container_cpu_average_core_equivalents_max": 16,
+      "aggregate_container_cpu_peak_core_equivalents_max": 18
+    }
+  },
+  "csv_worker_evaluation": {
+    "required": true,
+    "record": ["upload acceptance latency", "row completion throughput", "end-to-end batch completion latency", "row counts and model versions"],
+    "correctness": "all valid rows must reach a terminal status exactly once; no model version mismatch or unexpected restart",
+    "numeric_latency_and_throughput_gate": "短时 profile 只检查 CSV 链路能否跑通，不设 CSV 数值性能门槛"
+  },
+  "interpretation": "短时全栈 HTTPS/局域网压测，用于快速检查小规模部署；完整容量要求以 engineering-capacity-v1 为准。"
+}

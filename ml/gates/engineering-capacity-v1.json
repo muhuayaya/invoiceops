@@ -1,0 +1,63 @@
+{
+  "gate_id": "engineering-capacity-v1",
+  "status": "frozen",
+  "frozen_at": "2026-09-26T15:01:13+08:00",
+  "scope": {
+    "environment": "本机 Docker Desktop 与可信局域网",
+    "docker_desktop_reference": {
+      "logical_cpu_count": 20,
+      "memory_gib": 12
+    },
+    "compose_services": ["proxy", "web", "api", "worker", "postgres", "redis"],
+    "access_origins": ["localhost HTTPS", "第二台受信任 Windows 局域网设备 HTTPS"],
+    "candidate_versions": ["xlmr-c3d15da2f4d2", "tfidf-3fb0efe32633"],
+    "candidate_roles_measured_separately": ["primary", "fallback"],
+    "workloads": ["single classification", "CSV batch through API and worker"],
+    "input_policy": "仅使用压测专用的中英文文本和 CSV，不读取业务数据"
+  },
+  "load_profile": {
+    "concurrency_levels": [1, 2, 4, 8, 16],
+    "warmup_seconds_per_level": 120,
+    "measurement_seconds_per_level": 300,
+    "steady_concurrency": 8,
+    "burst": {
+      "concurrency": 16,
+      "duration_seconds": 300
+    },
+    "soak": {
+      "concurrency": 8,
+      "duration_seconds": 1800
+    },
+    "minimum_successful_valid_classification_requests_per_candidate": 10000
+  },
+  "acceptance": {
+    "steady_state": {
+      "concurrency": 8,
+      "successful_throughput_requests_per_second_min": 20,
+      "p95_latency_ms_max": 700,
+      "p99_latency_ms_max": 1000
+    },
+    "burst": {
+      "concurrency": 16,
+      "duration_seconds": 300,
+      "p95_latency_ms_max": 1000,
+      "p99_latency_ms_max": 1500
+    },
+    "valid_request_error_rate_max": 0.001,
+    "model_version_mismatches_max": 0,
+    "out_of_memory_events_max": 0,
+    "unexpected_container_restarts_max": 0,
+    "resources": {
+      "aggregate_container_memory_gib_max": 8,
+      "aggregate_container_cpu_average_core_equivalents_max": 16,
+      "aggregate_container_cpu_peak_core_equivalents_max": 18
+    }
+  },
+  "csv_worker_evaluation": {
+    "required": true,
+    "record": ["upload acceptance latency", "row completion throughput", "end-to-end batch completion latency", "row counts and model versions"],
+    "correctness": "all valid rows must reach a terminal status exactly once; no model version mismatch or unexpected restart",
+    "numeric_latency_and_throughput_gate": "not frozen; the numeric latency and throughput limits above apply to single classification requests"
+  },
+  "interpretation": "工程容量门槛。两个候选分别评估；测试结果不得用于修改门槛。历史 2026-09-26 API-only 报告在本门槛冻结前生成，不追溯评分。"
+}

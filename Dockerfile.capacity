@@ -1,0 +1,11 @@
+ARG INVOICEOPS_CAPACITY_BASE_IMAGE=invoiceops-api
+FROM ${INVOICEOPS_CAPACITY_BASE_IMAGE}
+
+ENV PYTHONPATH=/app:/app/src
+
+WORKDIR /app
+COPY src ./src
+COPY apps ./apps
+COPY ml ./ml
+COPY configs ./configs
+COPY infra/migrations ./infra/migrations

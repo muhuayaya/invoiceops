@@ -1,0 +1,12 @@
+# Fast local/LAN rebuild when the dependency layer is already present in
+# the existing Compose image. The normal Dockerfile remains the reproducible
+# clean build; this file only replaces application source after a code change.
+ARG BASE_IMAGE=invoiceops-api:latest
+FROM ${BASE_IMAGE}
+
+WORKDIR /app
+COPY src ./src
+COPY apps ./apps
+COPY .streamlit ./.streamlit
+COPY configs ./configs
+COPY infra/migrations ./infra/migrations

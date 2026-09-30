@@ -1,0 +1,13 @@
+{
+  "taxonomy_version": "invoiceops-v1",
+  "labels": [
+    "DUPLICATE_INVOICE",
+    "MISSING_PO_OR_RECEIPT",
+    "OTHER_REVIEW",
+    "PAYMENT_STATUS",
+    "PRICE_VARIANCE",
+    "QUANTITY_RECEIPT_VARIANCE",
+    "SUPPLIER_MASTER_CHANGE",
+    "TAX_CURRENCY_AMOUNT"
+  ]
+}

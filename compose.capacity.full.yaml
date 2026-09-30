@@ -1,0 +1,124 @@
+x-invoiceops-app: &invoiceops-app
+  image: ${INVOICEOPS_CAPACITY_IMAGE:?}
+  build:
+    context: .
+    dockerfile: Dockerfile.capacity
+    args:
+      INVOICEOPS_CAPACITY_BASE_IMAGE: ${INVOICEOPS_CAPACITY_BASE_IMAGE:?}
+  restart: "no"
+
+services:
+  proxy:
+    image: caddy:2.10
+    ports:
+      - "${INVOICEOPS_CAPACITY_BIND_ADDRESS:-0.0.0.0}:${INVOICEOPS_CAPACITY_HTTPS_PORT:?}:443"
+    environment:
+      INVOICEOPS_HOST: ${INVOICEOPS_HOST:?}
+    volumes:
+      - ./infra/caddy/Caddyfile.capacity:/etc/caddy/Caddyfile:ro
+      - capacity_proxy_config:/config
+      - type: volume
+        source: capacity_tls_data
+        target: /data
+    depends_on:
+      - web
+      - api
+    restart: "no"
+
+  web:
+    <<: *invoiceops-app
+    command: ["streamlit", "run", "apps/web/app.py", "--server.address=0.0.0.0", "--server.port=8501", "--server.headless=true"]
+    environment:
+      INVOICEOPS_API_URL: http://api:8000
+      PYTHONPATH: /app:/app/src
+    depends_on:
+      api:
+        condition: service_started
+
+  api:
+    <<: *invoiceops-app
+    command:
+      - sh
+      - -c
+      - >-
+        alembic -c infra/migrations/alembic.ini upgrade head
+        && python -m ml.benchmark_api --model /bench-model --role "$INVOICEOPS_CAPACITY_CANDIDATE_ROLE" --benchmark-only-unapproved-candidate
+    environment: &capacity_environment
+      INVOICEOPS_DATABASE_URL: postgresql+psycopg://invoiceops:${INVOICEOPS_CAPACITY_DB_PASSWORD:?}@postgres:5432/invoiceops_capacity
+      INVOICEOPS_REDIS_URL: redis://redis:6379/0
+      INVOICEOPS_TAXONOMY: /app/configs/taxonomy.json
+      INVOICEOPS_MODEL_DEVICE: cpu
+      INVOICEOPS_MODEL_INFERENCE_TIMEOUT_SECONDS: "10"
+      INVOICEOPS_MODEL_STARTUP_TIMEOUT_SECONDS: "180"
+      INVOICEOPS_BENCHMARK_ID: ${INVOICEOPS_CAPACITY_RUN_ID:?}
+      INVOICEOPS_BENCHMARK_MODE: capacity-only-unapproved-candidate
+      INVOICEOPS_CAPACITY_CANDIDATE_ROLE: ${INVOICEOPS_CAPACITY_CANDIDATE_ROLE:?}
+    volumes:
+      - type: bind
+        source: ${INVOICEOPS_CAPACITY_MODEL_PATH:?}
+        target: /bench-model
+        read_only: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 36
+
+  worker:
+    <<: *invoiceops-app
+    user: "65534:65534"
+    command: ["celery", "-A", "ml.benchmark_worker:celery_app", "worker", "--loglevel=INFO", "--beat", "--pool=solo", "--schedule=/tmp/celerybeat-schedule", "--concurrency=1"]
+    environment:
+      <<: *capacity_environment
+      INVOICEOPS_PRIMARY_MODEL: ${INVOICEOPS_CAPACITY_PRIMARY_MODEL:-}
+      INVOICEOPS_FALLBACK_MODEL: ${INVOICEOPS_CAPACITY_FALLBACK_MODEL:-}
+    volumes:
+      - type: bind
+        source: ${INVOICEOPS_CAPACITY_MODEL_PATH:?}
+        target: /bench-model
+        read_only: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: invoiceops
+      POSTGRES_PASSWORD: ${INVOICEOPS_CAPACITY_DB_PASSWORD:?}
+      POSTGRES_DB: invoiceops_capacity
+    volumes:
+      - capacity_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invoiceops -d invoiceops_capacity"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    restart: "no"
+
+  redis:
+    image: redis:7.4
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - capacity_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    restart: "no"
+
+volumes:
+  capacity_postgres_data:
+  capacity_redis_data:
+  capacity_proxy_config:
+  capacity_tls_data:
+    external: true
+    name: ${INVOICEOPS_CAPACITY_TLS_VOLUME:?}
