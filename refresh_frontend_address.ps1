@@ -91,8 +91,9 @@ if ($InstallAutoRun) {
     $logonTrigger.Delay = 'PT1M'  # 等 Docker Desktop 启动
     $action = New-ScheduledTaskAction -Execute 'powershell.exe' -WorkingDirectory $ProjectDir `
         -Argument "-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$PSCommandPath`" -Quiet"
+    # Queue：连续切换网络（如先拔网线再关 WLAN）时每次都会执行，最后一次反映最终状态
     $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
-        -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Minutes 5)
+        -MultipleInstances Queue -ExecutionTimeLimit (New-TimeSpan -Minutes 5)
     $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Limited
     Register-ScheduledTask -TaskName $TaskName -Trigger @($netTrigger, $logonTrigger) -Action $action `
         -Settings $settings -Principal $principal -Force `
