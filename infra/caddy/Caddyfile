@@ -1,8 +1,10 @@
 {
+    # 浏览器用 IP 访问时不发送 SNI，此时使用 INVOICEOPS_HOST 对应的证书
     default_sni {$INVOICEOPS_HOST}
 }
 
-{$INVOICEOPS_HOST}:443 {
+# 最后的 :443 接收任意主机名/IP 的请求，本机切换有线/无线网络后新 IP 仍可访问
+{$INVOICEOPS_HOST}:443, localhost:443, :443 {
     tls internal
 
     handle /healthz {

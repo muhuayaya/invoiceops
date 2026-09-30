@@ -162,7 +162,7 @@ uv run python -m ml.training train-xlmr --train data/invoiceops_train.csv --dev 
 1. 复制 `.env.example` 为 `.env`，并修改：
    - `POSTGRES_PASSWORD`：数据库密码，请使用随机强密码；
    - `INVOICEOPS_HOST`：本机局域网 IP 或可解析的主机名，会写入 HTTPS 证书；
-   - `INVOICEOPS_BIND_ADDRESS`、`INVOICEOPS_HTTPS_PORT`：监听地址与端口（默认 `127.0.0.1:8443`）。
+   - `INVOICEOPS_BIND_ADDRESS`、`INVOICEOPS_HTTPS_PORT`：监听地址与端口（默认 `127.0.0.1:8443`，仅本机可访问；设为 `0.0.0.0` 则所有网卡都可访问）。
 
    确认 `ml/artifacts/` 下已有 `xlmr-v2` 和 `tfidf-v2` 两个模型产物，部署时它们以只读方式挂载进容器。
 
@@ -190,6 +190,17 @@ uv run python -m ml.training train-xlmr --train data/invoiceops_train.csv --dev 
 
 5. 健康检查：`/healthz` 检查进程，`/readyz` 检查数据库与可用模型。
 
+6. 切换网络（有线/无线/热点）：`INVOICEOPS_BIND_ADDRESS=0.0.0.0` 时，本机任何网卡的 IP 都能访问，本机也可以一直用 `https://localhost:8443/`。运行下面的脚本，可把 `INVOICEOPS_HOST` 更新为当前上网网卡的 IP，只重建 `proxy` 容器，证书随之更新：
+
+   ```powershell
+   .\refresh_frontend_address.ps1                  # 检测并按需更新
+   .\refresh_frontend_address.ps1 -DryRun          # 只显示检测结果
+   .\refresh_frontend_address.ps1 -InstallAutoRun  # 登录及网络变化时自动运行
+   .\refresh_frontend_address.ps1 -UninstallAutoRun
+   ```
+
+   其他设备要访问，还需要 Windows 防火墙放行该端口的入站连接。
+
 只更新应用代码时，可以复用已有的依赖镜像快速构建：
 
 ```powershell
@@ -205,7 +216,7 @@ docker compose up -d --no-build api worker web
 |---|---|---|
 | `POSTGRES_PASSWORD` | PostgreSQL 密码 | 必填 |
 | `INVOICEOPS_HOST` | 访问用主机名或 IP，会写入证书 | 必填 |
-| `INVOICEOPS_BIND_ADDRESS` | HTTPS 监听地址 | 必填 |
+| `INVOICEOPS_BIND_ADDRESS` | HTTPS 监听地址；`0.0.0.0` 表示所有网卡 | 必填 |
 | `INVOICEOPS_HTTPS_PORT` | HTTPS 端口 | `8443` |
 | `INVOICEOPS_DEMO_MODE` | 为 `true` 时，校验通过的模型无需 `approval.json` 即可上线，并自动创建默认管理员；为 `false` 时模型需要 `approval.json` | `true` |
 | `INVOICEOPS_DEMO_ADMIN_EMAIL` / `INVOICEOPS_DEMO_ADMIN_PASSWORD` | 默认管理员账号 | `admin@example.local` / `InvoiceopsDemo2026` |
